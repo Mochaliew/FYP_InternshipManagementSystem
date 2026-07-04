@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FYP_InternshipManagementSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260704153406_Createdb")]
+    [Migration("20260704185704_Createdb")]
     partial class Createdb
     {
         /// <inheritdoc />

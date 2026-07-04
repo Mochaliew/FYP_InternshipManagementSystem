@@ -31,9 +31,6 @@ builder.Services.ConfigureApplicationCookie(options =>
 var app = builder.Build();
 
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
 
 if (!app.Environment.IsDevelopment())
 {
