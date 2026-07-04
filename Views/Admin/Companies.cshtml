@@ -1,0 +1,40 @@
+@model List<FYP_InternshipManagementSystem.Models.Company>
+@{
+    ViewData["Title"] = "Admin | Companies";
+}
+<div class="dashboard-header admin-header">
+    <div class="dashboard-brand"><div class="brand-title">Administrator Dashboard</div></div>
+    <div class="header-right">
+        <form asp-action="Logout" method="post" style="display:inline">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn-logout">Logout</button>
+        </form>
+    </div>
+</div>
+<nav class="dashboard-nav">
+    <a href="/Admin/Dashboard">Dashboard</a>
+    <a href="/Admin/Students">Students</a>
+    <a href="/Admin/Companies" class="active">Companies</a>
+    <a href="/Admin/Internships">Internships</a>
+    <a href="/Admin/Applications">Applications</a>
+</nav>
+<div class="page-content">
+    <h4>All Companies (@Model.Count)</h4>
+    <table class="admin-table">
+        <thead>
+            <tr><th>Name</th><th>Email</th><th>Location</th><th>Industry</th><th>Contact</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var c in Model)
+            {
+                <tr>
+                    <td>@c.User.Name</td>
+                    <td>@c.User.Email</td>
+                    <td>@c.CompanyLocation</td>
+                    <td>@c.IndustryType</td>
+                    <td>@c.CompanyContactNum</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

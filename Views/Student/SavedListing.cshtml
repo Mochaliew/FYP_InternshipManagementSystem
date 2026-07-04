@@ -1,0 +1,42 @@
+@model List<SavedInternship>
+@{
+    ViewData["Title"] = "Student | Saved Listing";
+}
+
+@await Html.PartialAsync("_StudentNav")
+
+<div class="page-content">
+    <div class="listing-list">
+        @foreach (var saved in Model)
+        {
+            var internship = saved.Internship;
+            var daysAgo = (int)(DateTime.Now - internship.CreatedAt).TotalDays;
+            <div class="listing-card">
+                <div class="listing-card-body">
+                    <h4 class="listing-title">@internship.Title</h4>
+                    <div class="listing-meta">
+                        <a href="/Student/Apply/@internship.InternshipId" class="company-link">
+                            @internship.Company.User.Name | @internship.Company.CompanyLocation
+                        </a>
+                    </div>
+                    <div class="listing-details">Duration @internship.Duration | Allowance @internship.Allowance</div>
+                </div>
+                <div class="listing-card-footer">
+                    <span class="listing-posted">Posted @daysAgo days ago</span>
+                    <div class="listing-actions">
+                        <form asp-action="RemoveSave" method="post" style="display:inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="internshipId" value="@internship.InternshipId" />
+                            <button type="submit" class="btn-remove-save">Remove Save</button>
+                        </form>
+                        <a href="/Student/Apply/@internship.InternshipId" class="btn-dark-sm">Apply Now</a>
+                    </div>
+                </div>
+            </div>
+        }
+        @if (!Model.Any())
+        {
+            <div class="empty-state">No saved internships yet.</div>
+        }
+    </div>
+</div>

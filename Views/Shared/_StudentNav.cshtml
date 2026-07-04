@@ -1,0 +1,38 @@
+@{
+    var name = ViewBag.StudentName as string ?? "";
+    var email = ViewBag.StudentEmail as string ?? "";
+    var pic = ViewBag.ProfilePic as string;
+    var ctrl = ViewContext.RouteData.Values["action"]?.ToString();
+}
+<div class="dashboard-header">
+    <div class="dashboard-brand">
+        <div class="brand-title">Internship Management System</div>
+        <div class="brand-sub">Student Dashboard</div>
+    </div>
+    <div class="header-right">
+        <div class="user-info">
+            <span class="user-name">@name</span>
+            <span class="user-email">@email</span>
+        </div>
+        <div class="avatar-circle">
+            @if (!string.IsNullOrEmpty(pic))
+            {
+                <img src="@pic" alt="Profile" />
+            }
+            else
+            {
+                <span>@(name.Length > 0 ? name[0].ToString().ToUpper() : "S")</span>
+            }
+        </div>
+        <form asp-controller="Student" asp-action="Logout" method="post" style="display:inline">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn-logout">Logout</button>
+        </form>
+    </div>
+</div>
+<nav class="dashboard-nav">
+    <a href="/Student/Listings" class="@(ctrl=="Listings"?"active":"")">Listings</a>
+    <a href="/Student/MyApplication" class="@(ctrl=="MyApplication"?"active":"")">My Application</a>
+    <a href="/Student/SavedListing" class="@(ctrl=="SavedListing"?"active":"")">Saved Listing</a>
+    <a href="/Student/Profile" class="@(ctrl=="Profile"?"active":"")">Profile</a>
+</nav>

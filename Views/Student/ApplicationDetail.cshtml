@@ -1,0 +1,66 @@
+@model Application
+@{
+    ViewData["Title"] = "Student | Internship After Clicking View Application";
+}
+
+@await Html.PartialAsync("_StudentNav")
+
+<div class="page-content">
+    <a href="/Student/MyApplication" class="back-link-page">&#8592; Back to My Applications</a>
+
+    <div class="detail-card">
+        <h3>@Model.Internship.Title</h3>
+        <div class="detail-meta">@Model.Internship.Company.User.Name | @Model.Internship.Company.CompanyLocation</div>
+        <div class="detail-sub">Duration @Model.Internship.Duration | Allowance @Model.Internship.Allowance</div>
+
+        <div class="detail-section">
+            <h5>Description</h5>
+            <p>@Model.Internship.Description</p>
+        </div>
+    </div>
+
+    <div class="detail-card mt-3">
+        <h4>Your Information</h4>
+        <div class="info-field-row"><span class="info-label">Name</span><span class="info-value">@Model.Student.User.Name</span></div>
+        <div class="info-field-row"><span class="info-label">Email Address</span><span class="info-value">@Model.Student.User.Email</span></div>
+        <div class="info-field-row"><span class="info-label">Phone Number</span><span class="info-value">@Model.Student.ContactNumber</span></div>
+
+        <div class="info-field-row">
+            <span class="info-label">Resume</span>
+            <span class="info-value">
+                @if (!string.IsNullOrEmpty(Model.ResumeNameSnapshot))
+                {
+                    <a href="@Model.ResumePathSnapshot" target="_blank">@Model.ResumeNameSnapshot</a>
+                }
+                else { <span>—</span> }
+            </span>
+        </div>
+
+        @if (Model.SupportingDocuments.Any())
+        {
+            <div class="info-field-row">
+                <span class="info-label">Supporting Documents</span>
+                <span class="info-value">
+                    @foreach (var doc in Model.SupportingDocuments)
+                    {
+                        <div><a href="@doc.SupportingDocPath" target="_blank">@doc.SupportingDocName</a></div>
+                    }
+                </span>
+            </div>
+        }
+
+        @{
+            string statusClass = Model.Status switch
+            {
+                "Approved" => "status-bar-approved",
+                "Rejected" => "status-bar-rejected",
+                _ => "status-bar-pending"
+            };
+        }
+        <div class="@statusClass mt-3">@Model.Status</div>
+        @if (Model.Status == "Approved")
+        {
+            <p class="status-note">*Company will send email for further information</p>
+        }
+    </div>
+</div>

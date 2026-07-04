@@ -1,0 +1,61 @@
+@model InternshipListViewModel
+@{
+    ViewData["Title"] = "Student | Listing";
+}
+
+@await Html.PartialAsync("_StudentNav")
+
+<div class="page-content">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert-success">@TempData["Success"]</div>
+    }
+
+    <div class="search-bar-row">
+        <form method="get" asp-action="Listings" class="search-form">
+            <input name="search" value="@Model.SearchQuery" class="search-input" placeholder="Search by Title / Company / Location etc..." />
+            <button type="submit" class="btn-filter">Filters</button>
+        </form>
+    </div>
+
+    <div class="listing-list">
+        @foreach (var internship in Model.Internships)
+        {
+            var isSaved = Model.SavedInternshipIds.Contains(internship.InternshipId);
+            var isApplied = Model.AppliedInternshipIds.Contains(internship.InternshipId);
+            var daysAgo = (int)(DateTime.Now - internship.CreatedAt).TotalDays;
+            <div class="listing-card">
+                <div class="listing-card-body">
+                    <h4 class="listing-title">@internship.Title</h4>
+                    <div class="listing-meta">@internship.Company.User.Name | @internship.Company.CompanyLocation</div>
+                    <div class="listing-desc">@internship.Description</div>
+                    <div class="listing-details">Duration @internship.Duration | Allowance @internship.Allowance</div>
+                </div>
+                <div class="listing-card-footer">
+                    <span class="listing-posted">Posted @daysAgo days ago</span>
+                    <div class="listing-actions">
+                        @if (!isApplied)
+                        {
+                            <form asp-action="ToggleSave" method="post" style="display:inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="internshipId" value="@internship.InternshipId" />
+                                <button type="submit" class="@(isSaved ? "btn-saved" : "btn-save")">
+                                    @(isSaved ? "Listing Saved" : "Save Listing")
+                                </button>
+                            </form>
+                            <a href="/Student/Apply/@internship.InternshipId" class="btn-dark-sm">Apply Now</a>
+                        }
+                        else
+                        {
+                            <span class="badge-applied">Already Applied</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+        @if (!Model.Internships.Any())
+        {
+            <div class="empty-state">No internship listings found.</div>
+        }
+    </div>
+</div>

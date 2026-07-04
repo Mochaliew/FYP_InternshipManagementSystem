@@ -1,0 +1,39 @@
+@model List<Application>
+@{
+    ViewData["Title"] = "Student | My application";
+}
+
+@await Html.PartialAsync("_StudentNav")
+
+<div class="page-content">
+    <div class="listing-list">
+        @foreach (var app in Model)
+        {
+            var daysAgo = (int)(DateTime.Now - app.AppliedAt).TotalDays;
+            string badgeClass = app.Status switch
+            {
+                "Approved" => "badge-approved",
+                "Rejected" => "badge-rejected",
+                _ => "badge-pending"
+            };
+            <div class="listing-card">
+                <div class="listing-card-body">
+                    <div class="listing-title-row">
+                        <h4 class="listing-title">@app.Internship.Title</h4>
+                        <span class="@badgeClass">@app.Status</span>
+                    </div>
+                    <div class="listing-meta">@app.Internship.Company.User.Name | @app.Internship.Company.CompanyLocation</div>
+                    <div class="listing-details">Duration @app.Internship.Duration | Allowance @app.Internship.Allowance</div>
+                </div>
+                <div class="listing-card-footer">
+                    <span class="listing-posted">Applied @daysAgo days ago</span>
+                    <a href="/Student/ApplicationDetail/@app.ApplicationId" class="btn-dark-sm">View Application</a>
+                </div>
+            </div>
+        }
+        @if (!Model.Any())
+        {
+            <div class="empty-state">You have not applied to any internship yet.</div>
+        }
+    </div>
+</div>

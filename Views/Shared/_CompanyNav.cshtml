@@ -1,0 +1,32 @@
+@{
+    var name = ViewBag.CompanyName as string ?? "";
+    var pic = ViewBag.ProfilePic as string;
+    var ctrl = ViewContext.RouteData.Values["action"]?.ToString();
+}
+<div class="dashboard-header company-header">
+    <div class="dashboard-brand">
+        <div class="brand-title">Company Dashboard</div>
+    </div>
+    <div class="header-right">
+        <span class="user-name">@name</span>
+        <div class="avatar-circle">
+            @if (!string.IsNullOrEmpty(pic))
+            {
+                <img src="@pic" alt="Profile" />
+            }
+            else
+            {
+                <span>@(name.Length > 0 ? name[0].ToString().ToUpper() : "C")</span>
+            }
+        </div>
+        <form asp-controller="Company" asp-action="Logout" method="post" style="display:inline">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn-logout">Logout</button>
+        </form>
+    </div>
+</div>
+<nav class="dashboard-nav">
+    <a href="/Company/Listings" class="@(ctrl=="Listings"?"active":"")">Listings</a>
+    <a href="/Company/Applications" class="@(ctrl is "Applications" or "ApplicationDetail"?"active":"")">Applications</a>
+    <a href="/Company/Profile" class="@(ctrl=="Profile"?"active":"")">Profile</a>
+</nav>

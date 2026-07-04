@@ -1,0 +1,94 @@
+@model List<Application>
+@{
+    ViewData["Title"] = "Student | Company Application List Page";
+}
+
+@await Html.PartialAsync("_CompanyNav")
+
+<div class="page-content">
+    @if (TempData["ShowApprovedModal"] != null)
+    {
+        <div id="approvedModal" class="modal-overlay" style="display:flex">
+            <div class="modal-box modal-box-approved">
+                <div class="approved-icon">&#10003;</div>
+                <h4>Application Approved!</h4>
+                <p class="approved-msg">Please contact the applicant for any extra information (interview, meeting, etc.).</p>
+                <div class="modal-actions" style="justify-content:center">
+                    <button class="btn-dark" onclick="document.getElementById('approvedModal').style.display='none'">OK</button>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="listing-list">
+        @foreach (var app in Model)
+        {
+            string badgeClass = app.Status switch
+            {
+                "Approved" => "badge-approved",
+                "Rejected" => "badge-rejected",
+                _ => "badge-pending"
+            };
+            string modalId = $"rejectModal_{app.ApplicationId}";
+
+            <div class="listing-card">
+                <div class="listing-card-body">
+                    <div class="listing-title-row">
+                        <h4 class="listing-title">@app.Student.User.Name</h4>
+                        <span class="@badgeClass">@app.Status</span>
+                    </div>
+                    <div class="listing-meta">Applied for : @app.Internship.Title</div>
+                    <div class="listing-meta">Email : @app.Student.User.Email</div>
+                    <div class="listing-meta">Programme : @app.Student.Programme</div>
+                    <div class="listing-meta">CGPA : @app.Student.CGPA</div>
+                </div>
+                <div class="listing-card-footer">
+                    <span class="listing-posted">Applied on : @app.AppliedAt.ToString("dd/MM/yyyy")</span>
+                    <div class="listing-actions">
+                        @if (app.Status != "Rejected")
+                        {
+                            <button type="button" class="btn-danger-sm"
+                                    onclick="document.getElementById('@modalId').style.display='flex'">
+                                Reject
+                            </button>
+                        }
+                        @if (app.Status != "Approved")
+                        {
+                            <form asp-action="UpdateApplicationStatus" method="post" style="display:inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="applicationId" value="@app.ApplicationId" />
+                                <input type="hidden" name="status" value="Approved" />
+                                <input type="hidden" name="returnTo" value="Applications" />
+                                <button type="submit" class="btn-success-sm">Approve</button>
+                            </form>
+                        }
+                        <a href="/Company/ApplicationDetail/@app.ApplicationId" class="btn-dark-sm">View Detail</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reject Confirm Modal for each card -->
+            <div id="@modalId" class="modal-overlay" style="display:none">
+                <div class="modal-box">
+                    <h4>Reject Application</h4>
+                    <p class="modal-confirm-msg">Are you sure you want to reject <strong>@app.Student.User.Name</strong>'s application for <strong>@app.Internship.Title</strong>?</p>
+                    <div class="modal-actions">
+                        <button type="button" class="btn-muted"
+                                onclick="document.getElementById('@modalId').style.display='none'">Cancel</button>
+                        <form asp-action="UpdateApplicationStatus" method="post" style="display:inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="applicationId" value="@app.ApplicationId" />
+                            <input type="hidden" name="status" value="Rejected" />
+                            <input type="hidden" name="returnTo" value="Applications" />
+                            <button type="submit" class="btn-danger">Confirm Reject</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+        @if (!Model.Any())
+        {
+            <div class="empty-state">No applications received yet.</div>
+        }
+    </div>
+</div>

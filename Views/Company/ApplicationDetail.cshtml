@@ -1,0 +1,137 @@
+@model Application
+@{
+    ViewData["Title"] = "Student | Application Detail Page";
+}
+
+@await Html.PartialAsync("_CompanyNav")
+
+<div class="page-content">
+
+    @* Approval success modal *@
+    @if (TempData["ShowApprovedModal"] != null)
+    {
+        <div id="approvedModal" class="modal-overlay" style="display:flex">
+            <div class="modal-box modal-box-approved">
+                <div class="approved-icon">&#10003;</div>
+                <h4>Application Approved!</h4>
+                <p class="approved-msg">Please contact the applicant for any extra information (interview, meeting, etc.).</p>
+                <div class="modal-actions" style="justify-content:center">
+                    <button class="btn-dark" onclick="document.getElementById('approvedModal').style.display='none'">OK</button>
+                </div>
+            </div>
+        </div>
+    }
+
+    @* Rejected banner *@
+    @if (TempData["ShowRejectedBanner"] != null)
+    {
+        <div class="alert-error">Application has been rejected.</div>
+    }
+
+    <a href="/Company/Applications" class="back-link-page">&#8592; Back to Applications</a>
+
+    <div class="detail-card">
+        <h3>@Model.Internship.Title</h3>
+        <div class="detail-meta">Department : @Model.Internship.Department</div>
+        <div class="detail-sub">Duration @Model.Internship.Duration | Allowance @Model.Internship.Allowance</div>
+    </div>
+
+    <div class="detail-card mt-3">
+        <div class="listing-title-row" style="margin-bottom:16px">
+            <h4 style="margin:0">Applicant Information</h4>
+            @{
+                string badgeClass = Model.Status switch
+                {
+                    "Approved" => "badge-approved",
+                    "Rejected" => "badge-rejected",
+                    _ => "badge-pending"
+                };
+            }
+            <span class="@badgeClass">@Model.Status</span>
+        </div>
+
+        <div class="info-label-bold">Name</div>
+        <div class="info-value">@Model.Student.User.Name</div>
+
+        <div class="info-label-bold mt-1">Email Address</div>
+        <div class="info-value">@Model.Student.User.Email</div>
+
+        <div class="info-label-bold mt-1">Phone Number</div>
+        <div class="info-value">@Model.Student.ContactNumber</div>
+
+        <div class="info-label-bold mt-1">CGPA</div>
+        <div class="info-value">@Model.Student.CGPA</div>
+
+        <div class="info-label-bold mt-1">Resume</div>
+        <div class="info-value">
+            @if (!string.IsNullOrEmpty(Model.ResumeNameSnapshot))
+            {
+                <a href="@Model.ResumePathSnapshot" target="_blank">@Model.ResumeNameSnapshot</a>
+            }
+            else { <span>—</span> }
+        </div>
+
+        @if (Model.SupportingDocuments.Any())
+        {
+            <div class="info-label-bold mt-1">Supporting Documents</div>
+            @foreach (var doc in Model.SupportingDocuments)
+            {
+                <div class="info-value"><a href="@doc.SupportingDocPath" target="_blank">@doc.SupportingDocName</a></div>
+            }
+        }
+
+        @if (!string.IsNullOrEmpty(Model.CoverLetter))
+        {
+            <div class="info-label-bold mt-1">Cover Letter</div>
+            <div class="info-value cover-letter-text">@Model.CoverLetter</div>
+        }
+
+        <div class="profile-actions mt-3">
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap">
+
+                @* View Applicant Profile *@
+                <a href="/Company/ApplicantProfile/@Model.ApplicationId" class="btn-dark">View Applicant Profile</a>
+
+                @* Reject — only show if not already rejected *@
+                @if (Model.Status != "Rejected")
+                {
+                    <button type="button" class="btn-danger"
+                            onclick="document.getElementById('rejectModal').style.display='flex'">
+                        Reject
+                    </button>
+                }
+
+                @* Approve — only show if not already approved *@
+                @if (Model.Status != "Approved")
+                {
+                    <form asp-action="UpdateApplicationStatus" method="post" style="display:inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="applicationId" value="@Model.ApplicationId" />
+                        <input type="hidden" name="status" value="Approved" />
+                        <input type="hidden" name="returnTo" value="Detail" />
+                        <button type="submit" class="btn-success">Approve</button>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Reject Confirmation Modal *@
+<div id="rejectModal" class="modal-overlay" style="display:none">
+    <div class="modal-box">
+        <h4>Reject Application</h4>
+        <p class="modal-confirm-msg">Are you sure you want to reject <strong>@Model.Student.User.Name</strong>'s application for <strong>@Model.Internship.Title</strong>?</p>
+        <div class="modal-actions">
+            <button type="button" class="btn-muted"
+                    onclick="document.getElementById('rejectModal').style.display='none'">Cancel</button>
+            <form asp-action="UpdateApplicationStatus" method="post" style="display:inline">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="applicationId" value="@Model.ApplicationId" />
+                <input type="hidden" name="status" value="Rejected" />
+                <input type="hidden" name="returnTo" value="Detail" />
+                <button type="submit" class="btn-danger">Confirm Reject</button>
+            </form>
+        </div>
+    </div>
+</div>

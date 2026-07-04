@@ -1,0 +1,90 @@
+@model ApplyInternshipViewModel
+@{
+    ViewData["Title"] = "Student | Internship After Clicking Apply Now";
+}
+
+@await Html.PartialAsync("_StudentNav")
+
+<div class="page-content">
+    <a href="/Student/Listings" class="back-link-page">&#8592; Back to Internship Listings</a>
+
+    <div class="detail-card">
+        <h3>@Model.Internship.Title</h3>
+        <div class="detail-meta">@Model.Internship.Company.User.Name | @Model.Internship.Company.CompanyLocation</div>
+        <div class="detail-sub">Duration @Model.Internship.Duration | Allowance @Model.Internship.Allowance</div>
+
+        <div class="detail-section">
+            <h5>Description</h5>
+            <p>@Model.Internship.Description</p>
+        </div>
+    </div>
+
+    <div class="detail-card mt-3">
+        <h4>Your Information</h4>
+        <form asp-action="Apply" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="InternshipId" value="@Model.InternshipId" />
+
+            <div class="info-field-row">
+                <span class="info-label">Name</span>
+                <span class="info-value">@Model.Student.User.Name</span>
+            </div>
+            <div class="info-field-row">
+                <span class="info-label">Email Address</span>
+                <span class="info-value">@Model.Student.User.Email</span>
+            </div>
+            <div class="info-field-row">
+                <span class="info-label">Phone Number</span>
+                <span class="info-value">@Model.Student.ContactNumber</span>
+            </div>
+
+            <div class="form-group mt-2">
+                <label class="info-label">Resume</label>
+                <div class="file-row">
+                    <label class="btn-upload" style="cursor:pointer">
+                        Click to upload Resume
+                        <input type="file" name="ResumeFile" accept=".pdf,.doc,.docx" hidden
+                               onchange="showFileName(this,'resumeFileLabel')" />
+                    </label>
+                    <span id="resumeFileLabel" class="file-current">
+                        @if (!string.IsNullOrEmpty(Model.Student.ResumeName))
+                        {
+                            <text>Current resume : @Model.Student.ResumeName</text>
+                        }
+                    </span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="info-label">Supporting Documents</label>
+                <label class="btn-upload" style="cursor:pointer">
+                    Click to upload
+                    <input type="file" name="SupportingDocuments" multiple accept=".pdf,.doc,.docx,.jpg,.png" hidden
+                           onchange="showMultiFileNames(this,'supportDocsLabel')" />
+                </label>
+                <span id="supportDocsLabel" class="file-current"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="info-label">Cover Letter</label>
+                <textarea name="CoverLetter" class="form-textarea" placeholder="Tell us more about you...">@Model.CoverLetter</textarea>
+            </div>
+
+            <button type="submit" class="btn-dark btn-full">Submit Application</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    function showFileName(input, labelId) {
+        if (!input.files || !input.files[0]) return;
+        document.getElementById(labelId).textContent = 'Selected: ' + input.files[0].name;
+    }
+    function showMultiFileNames(input, labelId) {
+        if (!input.files || input.files.length === 0) return;
+        var names = Array.from(input.files).map(f => f.name).join(', ');
+        document.getElementById(labelId).textContent = 'Selected: ' + names;
+    }
+</script>
+}

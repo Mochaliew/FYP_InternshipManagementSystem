@@ -1,0 +1,42 @@
+@model List<FYP_InternshipManagementSystem.Models.Internship>
+@{
+    ViewData["Title"] = "Admin | Internships";
+}
+<div class="dashboard-header admin-header">
+    <div class="dashboard-brand"><div class="brand-title">Administrator Dashboard</div></div>
+    <div class="header-right">
+        <form asp-action="Logout" method="post" style="display:inline">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn-logout">Logout</button>
+        </form>
+    </div>
+</div>
+<nav class="dashboard-nav">
+    <a href="/Admin/Dashboard">Dashboard</a>
+    <a href="/Admin/Students">Students</a>
+    <a href="/Admin/Companies">Companies</a>
+    <a href="/Admin/Internships" class="active">Internships</a>
+    <a href="/Admin/Applications">Applications</a>
+</nav>
+<div class="page-content">
+    <h4>All Internships (@Model.Count)</h4>
+    <table class="admin-table">
+        <thead>
+            <tr><th>Title</th><th>Company</th><th>Department</th><th>Duration</th><th>Allowance</th><th>Status</th><th>Applicants</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var i in Model)
+            {
+                <tr>
+                    <td>@i.Title</td>
+                    <td>@i.Company.User.Name</td>
+                    <td>@i.Department</td>
+                    <td>@i.Duration</td>
+                    <td>@i.Allowance</td>
+                    <td><span class="@(i.IsActive ? "badge-active" : "badge-inactive")">@(i.IsActive ? "Active" : "Inactive")</span></td>
+                    <td>@i.Applications.Count</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

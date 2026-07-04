@@ -1,0 +1,46 @@
+@model List<FYP_InternshipManagementSystem.Models.Application>
+@{
+    ViewData["Title"] = "Admin | Applications";
+}
+<div class="dashboard-header admin-header">
+    <div class="dashboard-brand"><div class="brand-title">Administrator Dashboard</div></div>
+    <div class="header-right">
+        <form asp-action="Logout" method="post" style="display:inline">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn-logout">Logout</button>
+        </form>
+    </div>
+</div>
+<nav class="dashboard-nav">
+    <a href="/Admin/Dashboard">Dashboard</a>
+    <a href="/Admin/Students">Students</a>
+    <a href="/Admin/Companies">Companies</a>
+    <a href="/Admin/Internships">Internships</a>
+    <a href="/Admin/Applications" class="active">Applications</a>
+</nav>
+<div class="page-content">
+    <h4>All Applications (@Model.Count)</h4>
+    <table class="admin-table">
+        <thead>
+            <tr><th>Student</th><th>Internship</th><th>Company</th><th>Applied On</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var a in Model)
+            {
+                string badgeClass = a.Status switch
+                {
+                    "Approved" => "badge-approved",
+                    "Rejected" => "badge-rejected",
+                    _ => "badge-pending"
+                };
+                <tr>
+                    <td>@a.Student.User.Name</td>
+                    <td>@a.Internship.Title</td>
+                    <td>@a.Internship.Company.User.Name</td>
+                    <td>@a.AppliedAt.ToString("dd/MM/yyyy")</td>
+                    <td><span class="@badgeClass">@a.Status</span></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,175 @@
+@model StudentProfileViewModel
+@{
+    ViewData["Title"] = "Student | Student Profile";
+}
+
+@await Html.PartialAsync("_StudentNav")
+
+<div class="page-content">
+    @if (TempData["Success"] != null) { <div class="alert-success">@TempData["Success"]</div> }
+    @if (TempData["Error"] != null)   { <div class="alert-error">@TempData["Error"]</div> }
+
+    <div class="profile-card">
+        <h4>Your Profile</h4>
+        <form asp-action="Profile" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="ProfilePicPath" value="@Model.ProfilePicPath" />
+            <input type="hidden" name="ResumePath"     value="@Model.ResumePath" />
+            <input type="hidden" name="ResumeName"     value="@Model.ResumeName" />
+
+            <div class="profile-pic-section">
+                <div class="profile-pic-wrapper">
+                    @if (!string.IsNullOrEmpty(Model.ProfilePicPath))
+                    {
+                        <img id="profilePreview" src="@Model.ProfilePicPath?v=@DateTime.Now.Ticks" class="profile-pic-img" alt="Profile" />
+                    }
+                    else
+                    {
+                        <img id="profilePreview" src="#" class="profile-pic-img" alt="Profile" style="display:none" />
+                        <div id="profilePlaceholder" class="profile-pic-placeholder"><span>Photo</span></div>
+                    }
+                </div>
+                <label class="btn-upload-small" style="cursor:pointer">
+                    Change Photo
+                    <input type="file" id="profilePicInput" name="ProfilePicFile"
+                           accept="image/*" hidden onchange="previewPhoto(this)" />
+                </label>
+                <span id="profilePicName" class="file-current" style="display:none"></span>
+            </div>
+
+            <div class="form-group">
+                <label>Name</label>
+                <input name="Name" value="@Model.Name" class="form-input" />
+            </div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <div class="input-with-action">
+                    <input name="Email" value="@Model.Email" class="form-input" readonly />
+                    <a href="javascript:void(0)" class="link-action" onclick="openModal('changeEmailModal')">Change Email ?</a>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input name="ContactNumber" value="@Model.ContactNumber" class="form-input" placeholder="01XXXXXXXXX" />
+            </div>
+            <div class="form-group">
+                <label>Educational Institution</label>
+                <input name="EducationalInstitution" value="@Model.EducationalInstitution" class="form-input" />
+            </div>
+            <div class="form-group">
+                <label>Programme</label>
+                <input name="Programme" value="@Model.Programme" class="form-input" placeholder="Bachelor Degree (HONOUR) ..." />
+            </div>
+            <div class="form-group">
+                <label>CGPA</label>
+                <input name="CGPA" value="@Model.CGPA" type="number" step="0.01" min="0" max="4" class="form-input-sm" />
+            </div>
+            <div class="form-group">
+                <label>Resume</label>
+                <div class="file-row">
+                    <label class="btn-upload" style="cursor:pointer">
+                        Click to upload Resume
+                        <input type="file" name="ResumeFile" accept=".pdf,.doc,.docx"
+                               hidden onchange="showResumeName(this)" />
+                    </label>
+                    <span id="resumeFileName" class="file-current">
+                        @if (!string.IsNullOrEmpty(Model.ResumeName))
+                        {
+                            <text>Current resume : @Model.ResumeName</text>
+                        }
+                    </span>
+                </div>
+            </div>
+
+            <div class="profile-actions">
+                <button type="button" class="btn-danger"
+                        onclick="openModal('changePwdModal')">
+                    Change Password
+                </button>
+                <button type="submit" class="btn-dark">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="changePwdModal" class="modal-overlay" style="display:none" onclick="backdropClose(event,'changePwdModal')">
+    <div class="modal-box">
+        <h4>Change Password</h4>
+        <form asp-controller="Student" asp-action="ChangePassword" method="post">
+            @Html.AntiForgeryToken()
+            <div class="form-group">
+                <label>Current Password</label>
+                <input name="CurrentPassword" type="password" class="form-input" />
+            </div>
+            <div class="form-group">
+                <label>New Password</label>
+                <input name="NewPassword" type="password" class="form-input" />
+            </div>
+            <div class="form-group">
+                <label>Confirm New Password</label>
+                <input name="ConfirmNewPassword" type="password" class="form-input" />
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-muted" onclick="closeModal('changePwdModal')">Cancel</button>
+                <button type="submit" class="btn-dark">Change Password</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="changeEmailModal" class="modal-overlay" style="display:none" onclick="backdropClose(event,'changeEmailModal')">
+    <div class="modal-box">
+        <h4>Change Email</h4>
+        <form asp-controller="Student" asp-action="ChangeEmail" method="post">
+            @Html.AntiForgeryToken()
+            <div class="form-group">
+                <label>New Email</label>
+                <input name="NewEmail" type="email" class="form-input" placeholder="Enter your new email" />
+            </div>
+            <div class="form-group">
+                <label>Current Password</label>
+                <input name="CurrentPassword" type="password" class="form-input" placeholder="Confirm with your password" />
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-muted" onclick="closeModal('changeEmailModal')">Cancel</button>
+                <button type="submit" class="btn-dark">Change Email</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    function openModal(id) {
+        document.getElementById(id).style.display = 'flex';
+    }
+    function closeModal(id) {
+        document.getElementById(id).style.display = 'none';
+    }
+    function backdropClose(event, id) {
+        if (event.target === document.getElementById(id)) closeModal(id);
+    }
+
+    function previewPhoto(input) {
+        if (!input.files || !input.files[0]) return;
+        var file = input.files[0];
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            var preview     = document.getElementById('profilePreview');
+            var placeholder = document.getElementById('profilePlaceholder');
+            var nameLabel   = document.getElementById('profilePicName');
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+            if (placeholder) placeholder.style.display = 'none';
+            nameLabel.textContent = file.name;
+            nameLabel.style.display = 'inline';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function showResumeName(input) {
+        if (!input.files || !input.files[0]) return;
+        document.getElementById('resumeFileName').textContent = 'Selected: ' + input.files[0].name;
+    }
+</script>
+}

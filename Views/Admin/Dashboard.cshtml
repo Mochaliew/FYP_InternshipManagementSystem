@@ -1,0 +1,44 @@
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+<div class="dashboard-header admin-header">
+    <div class="dashboard-brand"><div class="brand-title">Administrator Dashboard</div></div>
+    <div class="header-right">
+        <form asp-action="Logout" method="post" style="display:inline">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn-logout">Logout</button>
+        </form>
+    </div>
+</div>
+<nav class="dashboard-nav">
+    <a href="/Admin/Dashboard" class="active">Dashboard</a>
+    <a href="/Admin/Students">Students</a>
+    <a href="/Admin/Companies">Companies</a>
+    <a href="/Admin/Internships">Internships</a>
+    <a href="/Admin/Applications">Applications</a>
+</nav>
+
+<div class="page-content">
+    <div class="admin-stats-grid">
+        <div class="admin-stat-card">
+            <div class="stat-number">@ViewBag.TotalStudents</div>
+            <div class="stat-label">Total Students</div>
+        </div>
+        <div class="admin-stat-card">
+            <div class="stat-number">@ViewBag.TotalCompanies</div>
+            <div class="stat-label">Total Companies</div>
+        </div>
+        <div class="admin-stat-card">
+            <div class="stat-number">@ViewBag.TotalInternships</div>
+            <div class="stat-label">Total Internships</div>
+        </div>
+        <div class="admin-stat-card">
+            <div class="stat-number">@ViewBag.TotalApplications</div>
+            <div class="stat-label">Total Applications</div>
+        </div>
+        <div class="admin-stat-card">
+            <div class="stat-number">@ViewBag.PendingApplications</div>
+            <div class="stat-label">Pending Applications</div>
+        </div>
+    </div>
+</div>

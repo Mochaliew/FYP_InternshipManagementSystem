@@ -1,0 +1,52 @@
+@model CompanyDashboardViewModel
+@{
+    ViewData["Title"] = "Student | Company Main Page ( Listing )";
+}
+
+@await Html.PartialAsync("_CompanyNav")
+
+<div class="page-content">
+    @if (TempData["Success"] != null) { <div class="alert-success">@TempData["Success"]</div> }
+
+    <div class="company-stats-row">
+        <div class="stat-box">Active Listing : @Model.ActiveListingCount</div>
+        <div class="stat-box">Total Applicant : @Model.TotalApplicantCount</div>
+        <div class="stat-box">Pending Review : @Model.PendingReviewCount</div>
+        <a href="/Company/PostInternship" class="btn-dark-sm">Post new Internship Listing</a>
+    </div>
+
+    <div class="listing-list">
+        @foreach (var internship in Model.Internships)
+        {
+            <div class="listing-card">
+                <div class="listing-card-body">
+                    <div class="listing-title-row">
+                        <h4 class="listing-title">@internship.Title</h4>
+                        <span class="@(internship.IsActive ? "badge-active" : "badge-inactive")">
+                            @(internship.IsActive ? "Active" : "Inactive")
+                        </span>
+                    </div>
+                    <div class="listing-meta">Department : @internship.Department</div>
+                    <div class="listing-meta">Duration : @internship.Duration</div>
+                    <div class="listing-meta">Allowance : @internship.Allowance</div>
+                    <div class="listing-meta mt-1">Total Applicant : @internship.Applications.Count people</div>
+                </div>
+                <div class="listing-card-footer">
+                    <div class="listing-actions">
+                        <form asp-action="RemoveListing" method="post" style="display:inline"
+                              onsubmit="return confirm('Remove this listing?')">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@internship.InternshipId" />
+                            <button type="submit" class="btn-danger-sm">Remove Listing</button>
+                        </form>
+                        <a href="/Company/EditListing/@internship.InternshipId" class="btn-success-sm">Edit Listing</a>
+                    </div>
+                </div>
+            </div>
+        }
+        @if (!Model.Internships.Any())
+        {
+            <div class="empty-state">No internship listings yet. Post your first one!</div>
+        }
+    </div>
+</div>

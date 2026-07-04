@@ -1,0 +1,36 @@
+@model RegisterViewModel
+@{
+    ViewData["Title"] = "Student Sign up";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="auth-page student-auth-bg">
+    <div class="auth-breadcrumb">Student Sign up</div>
+    <div class="auth-outer">
+        <a href="/" class="back-link">&#8592; Back to Home</a>
+        <div class="auth-card">
+            <h2>Student Account Register</h2>
+            <form asp-action="Register" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input asp-for="Email" class="form-input" placeholder="Enter your Email ( XXX@edu.my )" />
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input asp-for="Password" type="password" class="form-input" placeholder="Enter your Password" />
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+                <div class="form-group">
+                    <input asp-for="ConfirmPassword" type="password" class="form-input" placeholder="Enter your Password again" />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                </div>
+                <button type="submit" class="btn-dark btn-full">Register Account</button>
+            </form>
+            <div class="auth-footer">
+                Have an Account ? <a href="/StudentAuth/Login">Login Here</a>
+            </div>
+        </div>
+    </div>
+</div>
