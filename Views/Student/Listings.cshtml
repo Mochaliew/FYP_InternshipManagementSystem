@@ -1,9 +1,147 @@
 @model InternshipListViewModel
 @{
     ViewData["Title"] = "Student | Listing";
+    var allowanceRange = ViewBag.AllowanceRange as string;
+    var duration = ViewBag.Duration as string;
+    var sortBy = ViewBag.SortBy as string;
 }
 
 @await Html.PartialAsync("_StudentNav")
+
+<style>
+    .filter-panel {
+        max-width: 980px;
+        margin: 0 auto 18px auto;
+        background: #fff;
+        border: 1px solid #e6e6e6;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 8px 20px rgba(0,0,0,.04);
+    }
+
+    .filter-title-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .filter-title {
+        font-weight: 700;
+        color: #222;
+    }
+
+    .filter-subtitle {
+        color: #888;
+        font-size: 12px;
+        margin-top: 2px;
+    }
+
+    .filter-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .filter-grid-secondary {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .filter-control {
+        width: 100%;
+        height: 38px;
+        border: 1px solid #dcdcdc;
+        border-radius: 8px;
+        padding: 0 12px;
+        background: #fff;
+        color: #333;
+        font-size: 13px;
+        outline: none;
+    }
+
+    .filter-control:focus {
+        border-color: #f0a4b5;
+        box-shadow: 0 0 0 3px rgba(240,164,181,.15);
+    }
+
+    .filter-buttons {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-filter-apply,
+    .btn-filter-reset {
+        height: 38px;
+        padding: 0 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+    }
+
+    .btn-filter-apply {
+        border: 1px solid #111;
+        background: #111;
+        color: #fff;
+    }
+
+    .btn-filter-reset {
+        border: 1px solid #d8d8d8;
+        background: #fff;
+        color: #333;
+    }
+
+    .btn-filter-reset:hover {
+        color: #111;
+        background: #f8f8f8;
+        text-decoration: none;
+    }
+
+    .listing-list {
+        max-width: 980px;
+        margin: 0 auto;
+    }
+
+    .listing-card {
+        border-radius: 12px;
+        border: 1px solid #e5e5e5;
+        box-shadow: 0 8px 20px rgba(0,0,0,.035);
+    }
+
+    .filter-result-count {
+        font-size: 12px;
+        color: #999;
+    }
+
+    @@media (max-width: 900px) {
+        .filter-grid,
+        .filter-grid-secondary {
+            grid-template-columns: 1fr;
+        }
+
+        .filter-title-row {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-buttons {
+            width: 100%;
+        }
+
+        .btn-filter-apply,
+        .btn-filter-reset {
+            flex: 1;
+        }
+    }
+</style>
 
 <div class="page-content">
     @if (TempData["Success"] != null)
@@ -11,10 +149,77 @@
         <div class="alert-success">@TempData["Success"]</div>
     }
 
-    <div class="search-bar-row">
-        <form method="get" asp-action="Listings" class="search-form">
-            <input name="search" value="@Model.SearchQuery" class="search-input" placeholder="Search by Title / Company / Location etc..." />
-            <button type="submit" class="btn-filter">Filters</button>
+    <div class="filter-panel">
+        <form method="get" asp-action="Listings">
+            <div class="filter-title-row">
+                <div>
+                    <div class="filter-title">Find Internship</div>
+                    <div class="filter-subtitle">Search and filter listings by location, allowance, duration, and department.</div>
+                </div>
+                <div class="filter-result-count">@Model.Internships.Count result(s)</div>
+            </div>
+
+            <div class="filter-grid">
+                <input name="search"
+                       value="@Model.SearchQuery"
+                       class="filter-control"
+                       placeholder="Search by title, company, location, or keyword..." />
+
+                <select name="location" class="filter-control">
+                    <!option value="" @(string.IsNullOrEmpty(Model.Location) ? "selected" : "")>All Locations</!option>
+                    <!option value="Kuala Lumpur" @(Model.Location == "Kuala Lumpur" ? "selected" : "")>Kuala Lumpur</!option>
+                    <!option value="Selangor" @(Model.Location == "Selangor" ? "selected" : "")>Selangor</!option>
+                    <!option value="Penang" @(Model.Location == "Penang" ? "selected" : "")>Penang</!option>
+                    <!option value="Johor" @(Model.Location == "Johor" ? "selected" : "")>Johor</!option>
+                    <!option value="Perak" @(Model.Location == "Perak" ? "selected" : "")>Perak</!option>
+                    <!option value="Melaka" @(Model.Location == "Melaka" ? "selected" : "")>Melaka</!option>
+                    <!option value="Negeri Sembilan" @(Model.Location == "Negeri Sembilan" ? "selected" : "")>Negeri Sembilan</!option>
+                    <!option value="Pahang" @(Model.Location == "Pahang" ? "selected" : "")>Pahang</!option>
+                    <!option value="Kedah" @(Model.Location == "Kedah" ? "selected" : "")>Kedah</!option>
+                    <!option value="Sabah" @(Model.Location == "Sabah" ? "selected" : "")>Sabah</!option>
+                    <!option value="Sarawak" @(Model.Location == "Sarawak" ? "selected" : "")>Sarawak</!option>
+                </select>
+
+                <select name="allowanceRange" class="filter-control">
+                    <!option value="" @(string.IsNullOrEmpty(allowanceRange) ? "selected" : "")>All Allowance</!option>
+                    <!option value="0-500" @(allowanceRange == "0-500" ? "selected" : "")>RM0 - RM500</!option>
+                    <!option value="501-800" @(allowanceRange == "501-800" ? "selected" : "")>RM501 - RM800</!option>
+                    <!option value="801-1000" @(allowanceRange == "801-1000" ? "selected" : "")>RM801 - RM1000</!option>
+                    <!option value="1001-1500" @(allowanceRange == "1001-1500" ? "selected" : "")>RM1001 - RM1500</!option>
+                    <!option value="1501-above" @(allowanceRange == "1501-above" ? "selected" : "")>Above RM1500</!option>
+                </select>
+            </div>
+
+            <div class="filter-grid-secondary">
+                <select name="duration" class="filter-control">
+                    <!option value="" @(string.IsNullOrEmpty(duration) ? "selected" : "")>All Duration</!option>
+                    <!option value="1" @(duration == "1" ? "selected" : "")>1 Month</!option>
+                    <!option value="2" @(duration == "2" ? "selected" : "")>2 Months</!option>
+                    <!option value="3" @(duration == "3" ? "selected" : "")>3 Months</!option>
+                    <!option value="4" @(duration == "4" ? "selected" : "")>4 Months</!option>
+                    <!option value="5" @(duration == "5" ? "selected" : "")>5 Months</!option>
+                    <!option value="6" @(duration == "6" ? "selected" : "")>6 Months</!option>
+                </select>
+
+                <select name="department" class="filter-control">
+                    <!option value="" @(string.IsNullOrEmpty(Model.Department) ? "selected" : "")>All Departments</!option>
+                    <!option value="Information Technology" @(Model.Department == "Information Technology" ? "selected" : "")>Information Technology</!option>
+                    <!option value="Marketing" @(Model.Department == "Marketing" ? "selected" : "")>Marketing</!option>
+                </select>
+
+                <select name="sortBy" class="filter-control">
+                    <!option value="latest" @(string.IsNullOrEmpty(sortBy) || sortBy == "latest" ? "selected" : "")>Sort: Latest</!option>
+                    <!option value="allowance-high" @(sortBy == "allowance-high" ? "selected" : "")>Highest Allowance</!option>
+                    <!option value="allowance-low" @(sortBy == "allowance-low" ? "selected" : "")>Lowest Allowance</!option>
+                    <!option value="duration-short" @(sortBy == "duration-short" ? "selected" : "")>Shortest Duration</!option>
+                    <!option value="duration-long" @(sortBy == "duration-long" ? "selected" : "")>Longest Duration</!option>
+                </select>
+
+                <div class="filter-buttons">
+                    <button type="submit" class="btn-filter-apply">Apply Filters</button>
+                    <a asp-action="Listings" class="btn-filter-reset">Reset</a>
+                </div>
+            </div>
         </form>
     </div>
 
@@ -24,13 +229,17 @@
             var isSaved = Model.SavedInternshipIds.Contains(internship.InternshipId);
             var isApplied = Model.AppliedInternshipIds.Contains(internship.InternshipId);
             var daysAgo = (int)(DateTime.Now - internship.CreatedAt).TotalDays;
+
             <div class="listing-card">
                 <div class="listing-card-body">
                     <h4 class="listing-title">@internship.Title</h4>
                     <div class="listing-meta">@internship.Company.User.Name | @internship.Company.CompanyLocation</div>
                     <div class="listing-desc">@internship.Description</div>
-                    <div class="listing-details">Duration @internship.Duration | Allowance @internship.Allowance</div>
+                    <div class="listing-details">
+                        Department @internship.Department | Duration @internship.Duration | Allowance @internship.Allowance
+                    </div>
                 </div>
+
                 <div class="listing-card-footer">
                     <span class="listing-posted">Posted @daysAgo days ago</span>
                     <div class="listing-actions">
@@ -43,6 +252,7 @@
                                     @(isSaved ? "Listing Saved" : "Save Listing")
                                 </button>
                             </form>
+
                             <a href="/Student/Apply/@internship.InternshipId" class="btn-dark-sm">Apply Now</a>
                         }
                         else
@@ -53,6 +263,7 @@
                 </div>
             </div>
         }
+
         @if (!Model.Internships.Any())
         {
             <div class="empty-state">No internship listings found.</div>

@@ -39,7 +39,13 @@ namespace FYP_InternshipManagementSystem.Controllers.Student
         }
 
         // ── Listings ─────────────────────────────────────────────
-        public async Task<IActionResult> Listings(string? search, string? location, string? department)
+        public async Task<IActionResult> Listings(
+            string? search,
+            string? location,
+            string? department,
+            string? allowanceRange,
+            string? duration,
+            string? sortBy)
         {
             var student = await GetStudentAsync();
 
@@ -48,19 +54,56 @@ namespace FYP_InternshipManagementSystem.Controllers.Student
                 .Where(i => i.IsActive);
 
             if (!string.IsNullOrWhiteSpace(search))
+            {
                 query = query.Where(i =>
                     i.Title.Contains(search) ||
                     i.Company.User.Name.Contains(search) ||
                     i.Company.CompanyLocation.Contains(search) ||
                     i.Department.Contains(search));
+            }
 
             if (!string.IsNullOrWhiteSpace(location))
+            {
                 query = query.Where(i => i.Company.CompanyLocation.Contains(location));
+            }
 
             if (!string.IsNullOrWhiteSpace(department))
+            {
                 query = query.Where(i => i.Department.Contains(department));
+            }
 
-            var internships = await query.OrderByDescending(i => i.CreatedAt).ToListAsync();
+            // Load first, then apply allowance/duration parsing safely because
+            // Allowance and Duration are stored as strings in the database.
+            var internships = await query.ToListAsync();
+
+            if (!string.IsNullOrWhiteSpace(allowanceRange))
+            {
+                internships = allowanceRange switch
+                {
+                    "0-500" => internships.Where(i => GetFirstNumber(i.Allowance) >= 0 && GetFirstNumber(i.Allowance) <= 500).ToList(),
+                    "501-800" => internships.Where(i => GetFirstNumber(i.Allowance) >= 501 && GetFirstNumber(i.Allowance) <= 800).ToList(),
+                    "801-1000" => internships.Where(i => GetFirstNumber(i.Allowance) >= 801 && GetFirstNumber(i.Allowance) <= 1000).ToList(),
+                    "1001-1500" => internships.Where(i => GetFirstNumber(i.Allowance) >= 1001 && GetFirstNumber(i.Allowance) <= 1500).ToList(),
+                    "1501-above" => internships.Where(i => GetFirstNumber(i.Allowance) >= 1501).ToList(),
+                    _ => internships
+                };
+            }
+
+            if (!string.IsNullOrWhiteSpace(duration))
+            {
+                internships = internships
+                    .Where(i => GetFirstNumber(i.Duration) == GetFirstNumber(duration))
+                    .ToList();
+            }
+
+            internships = sortBy switch
+            {
+                "allowance-high" => internships.OrderByDescending(i => GetFirstNumber(i.Allowance)).ToList(),
+                "allowance-low" => internships.OrderBy(i => GetFirstNumber(i.Allowance)).ToList(),
+                "duration-short" => internships.OrderBy(i => GetFirstNumber(i.Duration)).ToList(),
+                "duration-long" => internships.OrderByDescending(i => GetFirstNumber(i.Duration)).ToList(),
+                _ => internships.OrderByDescending(i => i.CreatedAt).ToList()
+            };
 
             var savedIds = await _db.SavedInternships
                 .Where(si => si.StudentId == student.StudentId)
@@ -71,6 +114,9 @@ namespace FYP_InternshipManagementSystem.Controllers.Student
                 .Select(a => a.InternshipId).ToListAsync();
 
             SetViewBag(student);
+            ViewBag.AllowanceRange = allowanceRange;
+            ViewBag.Duration = duration;
+            ViewBag.SortBy = sortBy;
 
             var vm = new InternshipListViewModel
             {
@@ -82,6 +128,14 @@ namespace FYP_InternshipManagementSystem.Controllers.Student
                 Department = department
             };
             return View(vm);
+        }
+
+        private static int GetFirstNumber(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return 0;
+
+            var digits = new string(value.Where(char.IsDigit).ToArray());
+            return int.TryParse(digits, out var number) ? number : 0;
         }
 
         // ── Apply ────────────────────────────────────────────────

@@ -37,8 +37,30 @@
     </div>
 
     <div class="detail-card mt-3">
-        <div class="listing-title-row" style="margin-bottom:16px">
-            <h4 style="margin:0">Applicant Information</h4>
+        <div class="listing-title-row" style="margin-bottom:22px;display:flex;justify-content:space-between;align-items:center;">
+            <div style="display:flex;align-items:center;gap:18px;">
+
+                <img src="@(string.IsNullOrEmpty(Model.Student.ProfilePic) ? "/images/default-profile.png" : Model.Student.ProfilePic)"
+                     alt="Applicant"
+                     style="
+                        width:150px;
+                        height:190px;
+                        object-fit:cover;
+                        border-radius:8px;
+                        border:2px solid #ddd;
+                        background:#fff;
+                        padding:3px;
+                        box-shadow:0 3px 10px rgba(0,0,0,.1);" />
+
+                <div>
+                    <h4 style="margin:0">@Model.Student.User.Name</h4>
+                    <div style="color:#777;font-size:14px;">
+                        Internship Applicant
+                    </div>
+                </div>
+
+            </div>
+
             @{
                 string badgeClass = Model.Status switch
                 {
@@ -47,7 +69,9 @@
                     _ => "badge-pending"
                 };
             }
+
             <span class="@badgeClass">@Model.Status</span>
+
         </div>
 
         <div class="info-label-bold">Name</div>
@@ -89,29 +113,27 @@
         <div class="profile-actions mt-3">
             <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap">
 
-                @* View Applicant Profile *@
-                <a href="/Company/ApplicantProfile/@Model.ApplicationId" class="btn-dark">View Applicant Profile</a>
-
-                @* Reject — only show if not already rejected *@
-                @if (Model.Status != "Rejected")
+                @* Only allow decision when application is still Pending *@
+                @if (Model.Status == "Pending")
                 {
-                    <button type="button" class="btn-danger"
+                    <button type="button"
+                            class="btn-danger"
                             onclick="document.getElementById('rejectModal').style.display='flex'">
                         Reject
                     </button>
-                }
 
-                @* Approve — only show if not already approved *@
-                @if (Model.Status != "Approved")
-                {
                     <form asp-action="UpdateApplicationStatus" method="post" style="display:inline">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="applicationId" value="@Model.ApplicationId" />
                         <input type="hidden" name="status" value="Approved" />
                         <input type="hidden" name="returnTo" value="Detail" />
-                        <button type="submit" class="btn-success">Approve</button>
+
+                        <button type="submit" class="btn-success">
+                            Approve
+                        </button>
                     </form>
                 }
+
             </div>
         </div>
     </div>

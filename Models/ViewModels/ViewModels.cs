@@ -53,6 +53,10 @@ namespace FYP_InternshipManagementSystem.Models.ViewModels
     {
         public string Name { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Contact number is required.")]
+        [RegularExpression(@"^\d{10}$",
+        ErrorMessage = "Contact number must contain exactly 10 digits.")]
         public string ContactNumber { get; set; } = string.Empty;
         public string EducationalInstitution { get; set; } = string.Empty;
         public string Programme { get; set; } = string.Empty;
@@ -206,6 +210,8 @@ public class ProgrammePlacementRow
 public class AdminEditStudentViewModel
 {
     public int StudentId { get; set; }
+
+    public string? ProfilePicture { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string ContactNumber { get; set; } = string.Empty;

@@ -42,30 +42,34 @@
                     <div class="listing-meta">Programme : @app.Student.Programme</div>
                     <div class="listing-meta">CGPA : @app.Student.CGPA</div>
                 </div>
-                <div class="listing-card-footer">
-                    <span class="listing-posted">Applied on : @app.AppliedAt.ToString("dd/MM/yyyy")</span>
-                    <div class="listing-actions">
-                        @if (app.Status != "Rejected")
-                        {
-                            <button type="button" class="btn-danger-sm"
-                                    onclick="document.getElementById('@modalId').style.display='flex'">
-                                Reject
+                <div class="listing-actions">
+
+                    @if (app.Status == "Pending")
+                    {
+                        <button type="button"
+                                class="btn-danger-sm"
+                                onclick="document.getElementById('@modalId').style.display='flex'">
+                            Reject
+                        </button>
+
+                        <form asp-action="UpdateApplicationStatus" method="post" style="display:inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="applicationId" value="@app.ApplicationId" />
+                            <input type="hidden" name="status" value="Approved" />
+                            <input type="hidden" name="returnTo" value="Applications" />
+
+                            <button type="submit" class="btn-success-sm">
+                                Approve
                             </button>
-                        }
-                        @if (app.Status != "Approved")
-                        {
-                            <form asp-action="UpdateApplicationStatus" method="post" style="display:inline">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="applicationId" value="@app.ApplicationId" />
-                                <input type="hidden" name="status" value="Approved" />
-                                <input type="hidden" name="returnTo" value="Applications" />
-                                <button type="submit" class="btn-success-sm">Approve</button>
-                            </form>
-                        }
-                        <a href="/Company/ApplicationDetail/@app.ApplicationId" class="btn-dark-sm">View Detail</a>
-                    </div>
+                        </form>
+                    }
+
+                    <a href="/Company/ApplicationDetail/@app.ApplicationId" class="btn-dark-sm">
+                        View Detail
+                    </a>
+
                 </div>
-            </div>
+                </div>
 
             <!-- Reject Confirm Modal for each card -->
             <div id="@modalId" class="modal-overlay" style="display:none">

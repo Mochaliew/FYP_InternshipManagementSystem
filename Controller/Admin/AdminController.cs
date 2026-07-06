@@ -109,6 +109,7 @@ namespace FYP_InternshipManagementSystem.Controllers.Admin
             return View(new AdminEditStudentViewModel
             {
                 StudentId = student.StudentId,
+                ProfilePicture = student.ProfilePic,
                 Name = student.User.Name,
                 Email = student.User.Email!,
                 ContactNumber = student.ContactNumber,
