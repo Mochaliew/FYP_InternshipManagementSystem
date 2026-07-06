@@ -1,0 +1,138 @@
+@model AdminReportsViewModel
+@{
+    ViewData["Title"] = "Report Preview";
+    var generatedAt = DateTime.Now.ToString("dd MMM yyyy, hh:mm tt");
+}
+
+@await Html.PartialAsync("_AdminNav")
+
+<style>
+    .btn-admin-report {
+        display: inline-block;
+        min-width: 140px;
+        padding: 10px 18px;
+        border: 1px solid #cfd6df;
+        border-radius: 8px;
+        background: #fff;
+        color: #212529;
+        text-align: center;
+        text-decoration: none;
+        font-weight: 500;
+        transition: .2s;
+    }
+
+        .btn-admin-report:hover {
+            background: #f8f9fa;
+            color: #000;
+            border-color: #adb5bd;
+            text-decoration: none;
+        }
+
+    @@media print {
+        .admin-topbar,
+        .admin-sidebar,
+        .report-actions {
+            display: none !important;
+        }
+
+        .admin-main {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+        }
+
+        .admin-table-card,
+        .admin-stat-box {
+            box-shadow: none !important;
+        }
+    }
+</style>
+
+<div class="admin-page-header">
+    <div>
+        <div class="admin-page-title">Report Preview</div>
+        <div class="admin-page-sub">Standalone internship report generated on @generatedAt</div>
+    </div>
+
+    <div class="report-actions" style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button type="button" onclick="window.print()" class="btn-admin-report">Print / Save PDF</button>
+        <a asp-action="DownloadReportHtml" class="btn-admin-report">Download HTML</a>
+        <a asp-action="DownloadReportCsv" class="btn-admin-report">Download CSV</a>
+        <a asp-action="Reports" class="btn-admin-report">Back</a>
+    </div>
+</div>
+
+<div class="admin-stats-row">
+    <div class="admin-stat-box">
+        Placement Rate<br />
+        <strong>@Model.PlacementRate%</strong>
+    </div>
+    <div class="admin-stat-box">
+        Total Students<br />
+        <strong>@Model.TotalStudents</strong>
+    </div>
+    <div class="admin-stat-box">
+        Active Internships<br />
+        <strong>@Model.ActiveInternships</strong>
+    </div>
+    <div class="admin-stat-box">
+        Approved Applications<br />
+        <strong>@Model.CompletedApplications</strong>
+    </div>
+</div>
+
+<div class="admin-table-card">
+    <div class="admin-table-title" style="margin-bottom:6px;">Internship Management Report</div>
+    <div style="color:#777;font-size:13px;margin-bottom:18px;">
+        This report summarizes student placement performance by programme.
+    </div>
+
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Programme</th>
+                <th>Total Students</th>
+                <th>Placed</th>
+                <th>Pending</th>
+                <th>Rejected</th>
+                <th>Rate</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in Model.PlacementByProgramme)
+            {
+                <tr>
+                    <td>@row.Programme</td>
+                    <td>@row.TotalStudents</td>
+                    <td>@row.Placed</td>
+                    <td>@row.Pending</td>
+                    <td>@row.Rejected</td>
+                    <td><strong>@row.Rate</strong></td>
+                </tr>
+            }
+
+            @if (!Model.PlacementByProgramme.Any())
+            {
+                <tr>
+                    <td colspan="6" class="text-center text-muted">No report data available.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="admin-table-card mt-3">
+    <div class="admin-table-title">Report Footer</div>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:12px;">
+        <div>
+            <div style="color:#777;font-size:13px;">System</div>
+            <strong>FYP Internship Management System</strong>
+        </div>
+        <div>
+            <div style="color:#777;font-size:13px;">Prepared For</div>
+            <strong>Administrator</strong>
+        </div>
+    </div>
+</div>
+
+@await Html.PartialAsync("_AdminNavClose")

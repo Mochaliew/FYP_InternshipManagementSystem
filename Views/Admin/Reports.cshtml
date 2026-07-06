@@ -1,0 +1,124 @@
+@model AdminReportsViewModel
+@{
+    ViewData["Title"] = "Administrator panel - reports";
+}
+
+@await Html.PartialAsync("_AdminNav")
+
+<style>
+    .report-btn {
+        display: inline-block;
+        min-width: 140px;
+        padding: 10px 18px;
+        border: 1px solid #cfd6df;
+        border-radius: 8px;
+        background: #fff;
+        color: #212529;
+        text-align: center;
+        text-decoration: none;
+        font-weight: 500;
+        transition: .2s;
+    }
+
+        .report-btn:hover {
+            background: #f8f9fa;
+            color: #000;
+            border-color: #adb5bd;
+            text-decoration: none;
+        }
+</style>
+
+<div class="admin-page-header">
+    <div>
+        <div class="admin-page-title">Reports</div>
+        <div class="admin-page-sub">Generate, preview, and download administrator reports</div>
+    </div>
+</div>
+
+<div class="admin-stats-row">
+    <div class="admin-stat-box">Placement Rate<br /><strong>@Model.PlacementRate%</strong></div>
+    <div class="admin-stat-box">Total Students<br /><strong>@Model.TotalStudents</strong></div>
+    <div class="admin-stat-box">Active Internships<br /><strong>@Model.ActiveInternships</strong></div>
+    <div class="admin-stat-box">Approved Applications<br /><strong>@Model.CompletedApplications</strong></div>
+</div>
+
+<div class="admin-table-card">
+    <div class="admin-table-title" style="margin-bottom:16px">Placement Summary by Programme</div>
+
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Programme</th>
+                <th>Total Students</th>
+                <th>Placed</th>
+                <th>Pending</th>
+                <th>Rejected</th>
+                <th>Rate</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in Model.PlacementByProgramme)
+            {
+                <tr>
+                    <td>@row.Programme</td>
+                    <td>@row.TotalStudents</td>
+                    <td>@row.Placed</td>
+                    <td>@row.Pending</td>
+                    <td>@row.Rejected</td>
+                    <td><strong>@row.Rate</strong></td>
+                </tr>
+            }
+
+            @if (!Model.PlacementByProgramme.Any())
+            {
+                <tr>
+                    <td colspan="6" class="text-center text-muted">No data yet.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="admin-table-card mt-3">
+    <div class="admin-table-title">Download Report</div>
+    <div class="text-muted" style="margin-bottom:16px">
+        Choose a report format. The preview page can also be printed or saved as PDF from browser.
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(220px,1fr));gap:16px">
+        <div style="border:1px solid #eee;border-radius:12px;padding:18px;background:#fff">
+            <strong>Standalone Preview</strong>
+            <p class="text-muted" style="margin:10px 0 16px">
+                Open a clean independent report page before downloading or printing.
+            </p>
+
+            <a asp-controller="Admin" asp-action="ReportPreview" class="report-btn">
+                Open Preview
+            </a>
+        </div>
+
+        <div style="border:1px solid #eee;border-radius:12px;padding:18px;background:#fff">
+            <strong>HTML Report</strong>
+            <p class="text-muted" style="margin:10px 0 16px">
+                Download a formatted report file that follows the original admin theme.
+            </p>
+
+            <a asp-controller="Admin" asp-action="DownloadHtmlReport" class="report-btn">
+                Download HTML
+            </a>
+        </div>
+
+        <div style="border:1px solid #eee;border-radius:12px;padding:18px;background:#fff">
+            <strong>CSV Data</strong>
+            <p class="text-muted" style="margin:10px 0 16px">
+                Download raw summary data for Excel or further analysis.
+            </p>
+
+            <a asp-controller="Admin" asp-action="DownloadCsvReport" class="report-btn">
+                Download CSV
+            </a>
+        </div>
+    </div>
+</div>
+
+@await Html.PartialAsync("_AdminNavClose")

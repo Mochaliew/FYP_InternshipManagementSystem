@@ -1,0 +1,49 @@
+@model RegisterViewModel
+@{
+    ViewData["Title"] = "Add Company";
+}
+
+@await Html.PartialAsync("_AdminNav")
+
+<style>
+    .account-form-wrap { max-width: 680px; }
+    .form-help { color: #6b7280; font-size: 13px; margin-top: 4px; }
+    .form-action-row { display: flex; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
+</style>
+
+<div class="admin-page-header">
+    <div>
+        <div class="admin-page-title">Add Company Account</div>
+        <div class="admin-page-sub">Create a new company login account</div>
+    </div>
+</div>
+
+<div class="admin-table-card account-form-wrap">
+    <form asp-action="AddCompany" method="post">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+        <div class="form-group">
+            <label>Email</label>
+            <input asp-for="Email" class="form-input" placeholder="company@gmail.com" />
+            <div class="form-help">This email will be used as the company's username.</div>
+        </div>
+
+        <div class="form-group">
+            <label>Password</label>
+            <input asp-for="Password" type="password" class="form-input" placeholder="Minimum 6 characters" />
+        </div>
+
+        <div class="form-group">
+            <label>Confirm Password</label>
+            <input asp-for="ConfirmPassword" type="password" class="form-input" placeholder="Re-enter password" />
+        </div>
+
+        <div class="form-action-row">
+            <a href="/Admin/ManageAccount" class="btn-muted">Cancel</a>
+            <button type="submit" class="btn-dark">Create Company Account</button>
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("_AdminNavClose")

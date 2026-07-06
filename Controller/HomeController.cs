@@ -11,7 +11,7 @@ namespace FYP_InternshipManagementSystem.Controllers
             if (User.IsInRole("Company"))
                 return RedirectToAction("Listings", "Company");
             if (User.IsInRole("Administrator"))
-                return RedirectToAction("Dashboard", "Admin");
+                return RedirectToAction("ManageAccount", "Admin");
 
             return View();
         }

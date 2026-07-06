@@ -1,3 +1,4 @@
+using FYP_InternshipManagementSystem.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace FYP_InternshipManagementSystem.Models.ViewModels
@@ -144,3 +145,85 @@ namespace FYP_InternshipManagementSystem.Models.ViewModels
         public List<Internship> Internships { get; set; } = new();
     }
 }
+
+// ─── Admin ──────────────────────────────────────────
+public class AdminManageAccountViewModel
+{
+    public List<Student> Students { get; set; } = new();
+    public List<Company> Companies { get; set; } = new();
+    public int TotalStudents { get; set; }
+    public int TotalCompanies { get; set; }
+    public int ActiveAccounts { get; set; }
+    public int DeactivatedAccounts { get; set; }
+    public string? StatusFilter { get; set; }
+}
+
+public class AdminApproveUsersViewModel
+{
+    public List<ApplicationUser> PendingUsers { get; set; } = new();
+    public List<ApplicationUser> DeactivatedUsers { get; set; } = new();
+    public int PendingCount { get; set; }
+    public int ApprovedToday { get; set; }
+    public int RejectedCount { get; set; }
+    public int DeactivatedCount { get; set; }
+}
+
+public class AdminInternshipRecordsViewModel
+{
+    public List<Internship> Internships { get; set; } = new();
+    public string? StatusFilter { get; set; }
+}
+
+public class AdminApplicationsViewModel
+{
+    public List<Application> Applications { get; set; } = new();
+    public int TotalApplications { get; set; }
+    public int PendingCount { get; set; }
+    public int ApprovedCount { get; set; }
+    public int RejectedCount { get; set; }
+    public string? StatusFilter { get; set; }
+}
+
+public class AdminReportsViewModel
+{
+    public int TotalStudents { get; set; }
+    public int ActiveInternships { get; set; }
+    public int CompletedApplications { get; set; }
+    public double PlacementRate { get; set; }
+    public List<ProgrammePlacementRow> PlacementByProgramme { get; set; } = new();
+}
+
+public class ProgrammePlacementRow
+{
+    public string Programme { get; set; } = string.Empty;
+    public int TotalStudents { get; set; }
+    public int Placed { get; set; }
+    public int Pending { get; set; }
+    public int Rejected { get; set; }
+    public string Rate => TotalStudents > 0 ? $"{(Placed * 100.0 / TotalStudents):F1}%" : "0%";
+}
+
+public class AdminEditStudentViewModel
+{
+    public int StudentId { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string ContactNumber { get; set; } = string.Empty;
+    public string Programme { get; set; } = string.Empty;
+    public string EducationalInstitution { get; set; } = string.Empty;
+    public decimal CGPA { get; set; }
+    public string Status { get; set; } = "Active";
+}
+
+public class AdminEditCompanyViewModel
+{
+    public int CompanyId { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string CompanyContactNum { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public string CompanyLocation { get; set; } = string.Empty;
+    public string IndustryType { get; set; } = string.Empty;
+    public string Status { get; set; } = "Active";
+}
+

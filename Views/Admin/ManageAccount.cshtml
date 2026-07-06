@@ -1,0 +1,208 @@
+@model AdminManageAccountViewModel
+@{
+    ViewData["Title"] = "Administrator panel - manage accounts";
+}
+
+@await Html.PartialAsync("_AdminNav")
+
+<style>
+    .account-toolbar {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    .account-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .account-name-cell strong {
+        display: block;
+        color: #111827;
+    }
+
+    .account-name-cell span {
+        display: block;
+        color: #6b7280;
+        font-size: 12px;
+        margin-top: 3px;
+    }
+
+    .account-empty {
+        padding: 22px;
+        text-align: center;
+        color: #6b7280;
+    }
+
+    @@media (max-width: 900px) {
+        .account-toolbar {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+</style>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert-success mb-3">@TempData["Success"]</div>
+}
+
+<div class="admin-page-header">
+    <div>
+        <div class="admin-page-title">Manage Accounts</div>
+        <div class="admin-page-sub">Manage student and company accounts in one place</div>
+    </div>
+    <div class="account-actions">
+        <a href="/Admin/AddStudent" class="btn-admin-add">+ Add Student</a>
+        <a href="/Admin/AddCompany" class="btn-admin-add">+ Add Company</a>
+    </div>
+</div>
+
+<div class="admin-stats-row">
+    <div class="admin-stat-box">Total Students<br /><strong>@Model.TotalStudents</strong></div>
+    <div class="admin-stat-box">Total Companies<br /><strong>@Model.TotalCompanies</strong></div>
+    <div class="admin-stat-box">Active Accounts<br /><strong>@Model.ActiveAccounts</strong></div>
+    <div class="admin-stat-box">Deactivated<br /><strong>@Model.DeactivatedAccounts</strong></div>
+</div>
+
+<div class="admin-table-card">
+    <div class="account-toolbar">
+        <div>
+            <div class="admin-table-title">Student Accounts</div>
+            <div class="text-muted small">View, edit, activate, or deactivate student login access.</div>
+        </div>
+        <form method="get" class="account-actions">
+            <select name="statusFilter" class="admin-select" onchange="this.form.submit()">
+                <option value="">All Status</option>
+                <!option value="Active" @(Model.StatusFilter == "Active" ? "selected" : "")>Active</!option>
+                <!option value="Deactivated" @(Model.StatusFilter == "Deactivated" ? "selected" : "")>Deactivated</!option>
+            </select>
+        </form>
+    </div>
+
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Student</th>
+                <th>Programme</th>
+                <th>Institution</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in Model.Students)
+            {
+                <tr>
+                    <td>@s.StudentId</td>
+                    <td class="account-name-cell">
+                        <strong>@s.User.Name</strong>
+                        <span>@s.User.Email</span>
+                    </td>
+                    <td>@(string.IsNullOrEmpty(s.Programme) ? "—" : s.Programme)</td>
+                    <td>@(string.IsNullOrEmpty(s.EducationalInstitution) ? "—" : s.EducationalInstitution)</td>
+                    <td><span class="@(s.User.Status == "Active" ? "badge-active" : "badge-inactive")">@s.User.Status</span></td>
+                    <td>
+                        <div class="account-actions">
+                            <a href="/Admin/EditStudent/@s.StudentId" class="btn-admin-edit">Edit</a>
+                            @if (s.User.Status == "Active")
+                            {
+                                <form asp-action="SetUserStatus" method="post" style="display:inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="userId" value="@s.UserId" />
+                                    <input type="hidden" name="status" value="Deactivated" />
+                                    <button type="submit" class="btn-admin-deactivate">Deactivate</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form asp-action="SetUserStatus" method="post" style="display:inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="userId" value="@s.UserId" />
+                                    <input type="hidden" name="status" value="Active" />
+                                    <button type="submit" class="btn-admin-activate">Activate</button>
+                                </form>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
+            @if (!Model.Students.Any())
+            {
+                <tr><td colspan="6" class="account-empty">No students found.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="admin-table-card mt-3">
+    <div class="account-toolbar">
+        <div>
+            <div class="admin-table-title">Company Accounts</div>
+            <div class="text-muted small">Manage company profile status and access control.</div>
+        </div>
+    </div>
+
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Company</th>
+                <th>Contact</th>
+                <th>Location</th>
+                <th>Industry</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var c in Model.Companies)
+            {
+                <tr>
+                    <td class="account-name-cell">
+                        <strong>@c.User.Name</strong>
+                        <span>@c.User.Email</span>
+                    </td>
+                    <td>@(string.IsNullOrEmpty(c.CompanyContactNum) ? "—" : c.CompanyContactNum)</td>
+                    <td>@(string.IsNullOrEmpty(c.CompanyLocation) ? "—" : c.CompanyLocation)</td>
+                    <td>@(string.IsNullOrEmpty(c.IndustryType) ? "—" : c.IndustryType)</td>
+                    <td><span class="@(c.User.Status == "Active" ? "badge-active" : "badge-inactive")">@c.User.Status</span></td>
+                    <td>
+                        <div class="account-actions">
+                            <a href="/Admin/EditCompany/@c.CompanyId" class="btn-admin-edit">Edit</a>
+                            @if (c.User.Status == "Active")
+                            {
+                                <form asp-action="SetUserStatus" method="post" style="display:inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="userId" value="@c.UserId" />
+                                    <input type="hidden" name="status" value="Deactivated" />
+                                    <button type="submit" class="btn-admin-deactivate">Deactivate</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form asp-action="SetUserStatus" method="post" style="display:inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="userId" value="@c.UserId" />
+                                    <input type="hidden" name="status" value="Active" />
+                                    <button type="submit" class="btn-admin-activate">Activate</button>
+                                </form>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
+            @if (!Model.Companies.Any())
+            {
+                <tr><td colspan="6" class="account-empty">No companies found.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@await Html.PartialAsync("_AdminNavClose")

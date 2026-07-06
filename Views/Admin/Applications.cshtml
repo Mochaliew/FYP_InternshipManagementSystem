@@ -1,31 +1,81 @@
-@model List<FYP_InternshipManagementSystem.Models.Application>
+@model AdminApplicationsViewModel
 @{
-    ViewData["Title"] = "Admin | Applications";
+    ViewData["Title"] = "Administrator panel - applications";
 }
-<div class="dashboard-header admin-header">
-    <div class="dashboard-brand"><div class="brand-title">Administrator Dashboard</div></div>
-    <div class="header-right">
-        <form asp-action="Logout" method="post" style="display:inline">
-            @Html.AntiForgeryToken()
-            <button type="submit" class="btn-logout">Logout</button>
-        </form>
+
+@await Html.PartialAsync("_AdminNav")
+
+<style>
+    .admin-action-group {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .btn-admin-remove {
+        border: 1px solid #dc3545;
+        background: #fff;
+        color: #dc3545;
+        border-radius: 6px;
+        padding: 6px 12px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+    .btn-admin-remove:hover {
+        background: #dc3545;
+        color: #fff;
+    }
+</style>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert-success mb-3">@TempData["Success"]</div>
+}
+
+<div class="admin-page-header">
+    <div>
+        <div class="admin-page-title">Applications</div>
+        <div class="admin-page-sub">monitor and update application status</div>
     </div>
 </div>
-<nav class="dashboard-nav">
-    <a href="/Admin/Dashboard">Dashboard</a>
-    <a href="/Admin/Students">Students</a>
-    <a href="/Admin/Companies">Companies</a>
-    <a href="/Admin/Internships">Internships</a>
-    <a href="/Admin/Applications" class="active">Applications</a>
-</nav>
-<div class="page-content">
-    <h4>All Applications (@Model.Count)</h4>
+
+<div class="admin-stats-row">
+    <div class="admin-stat-box">Total Applications<br /><strong>@Model.TotalApplications</strong></div>
+    <div class="admin-stat-box">Pending<br /><strong>@Model.PendingCount</strong></div>
+    <div class="admin-stat-box">Approved<br /><strong>@Model.ApprovedCount</strong></div>
+    <div class="admin-stat-box">Rejected<br /><strong>@Model.RejectedCount</strong></div>
+</div>
+
+<div class="admin-table-card">
+    <div class="admin-table-header">
+        <span class="admin-table-title">All Applications</span>
+        <form method="get" style="display:inline">
+            <select name="statusFilter" class="admin-select" onchange="this.form.submit()">
+                <option value="">All Status</option>
+                <!option value="Pending" @(Model.StatusFilter == "Pending" ? "selected" : "")>Pending</!option>
+                <!option value="Approved" @(Model.StatusFilter == "Approved" ? "selected" : "")>Approved</!option>
+                <!option value="Rejected" @(Model.StatusFilter == "Rejected" ? "selected" : "")>Rejected</!option>
+            </select>
+        </form>
+    </div>
+
     <table class="admin-table">
         <thead>
-            <tr><th>Student</th><th>Internship</th><th>Company</th><th>Applied On</th><th>Status</th></tr>
+            <tr>
+                <th>Student</th>
+                <th>Company</th>
+                <th>Department</th>
+                <th>Date Applied</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
         </thead>
         <tbody>
-            @foreach (var a in Model)
+            @foreach (var a in Model.Applications)
             {
                 string badgeClass = a.Status switch
                 {
@@ -33,14 +83,51 @@
                     "Rejected" => "badge-rejected",
                     _ => "badge-pending"
                 };
+
                 <tr>
                     <td>@a.Student.User.Name</td>
-                    <td>@a.Internship.Title</td>
                     <td>@a.Internship.Company.User.Name</td>
+                    <td>@a.Internship.Department</td>
                     <td>@a.AppliedAt.ToString("dd/MM/yyyy")</td>
                     <td><span class="@badgeClass">@a.Status</span></td>
+                    <td>
+                        <div class="admin-action-group">
+                            @if (a.Status == "Pending")
+                            {
+                                <form asp-action="AdminUpdateApplicationStatus" method="post" style="display:inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="applicationId" value="@a.ApplicationId" />
+                                    <input type="hidden" name="status" value="Approved" />
+                                    <button type="submit" class="btn-admin-activate">Approve</button>
+                                </form>
+
+                                <form asp-action="AdminUpdateApplicationStatus" method="post" style="display:inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="applicationId" value="@a.ApplicationId" />
+                                    <input type="hidden" name="status" value="Rejected" />
+                                    <button type="submit" class="btn-admin-deactivate">Reject</button>
+                                </form>
+                            }
+
+                            <form asp-action="DeleteApplication" method="post" style="display:inline"
+                                  onsubmit="return confirm('Remove this application permanently?');">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="applicationId" value="@a.ApplicationId" />
+                                <button type="submit" class="btn-admin-remove">Remove</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+
+            @if (!Model.Applications.Any())
+            {
+                <tr>
+                    <td colspan="6" class="text-center text-muted">No applications found.</td>
                 </tr>
             }
         </tbody>
     </table>
 </div>
+
+@await Html.PartialAsync("_AdminNavClose")

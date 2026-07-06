@@ -1,0 +1,93 @@
+@model AdminApproveUsersViewModel
+@{ ViewData["Title"] = "Administrator panel - approve users";
+   var userRoles = ViewBag.UserRoles as Dictionary<string, string> ?? new(); }
+
+@await Html.PartialAsync("_AdminNav")
+
+@if (TempData["Success"] != null) { <div class="alert-success mb-3">@TempData["Success"]</div> }
+
+<div class="admin-page-header">
+    <div>
+        <div class="admin-page-title">Approve users</div>
+        <div class="admin-page-sub">approve or deactivate user accounts</div>
+    </div>
+</div>
+
+<div class="admin-stats-row">
+    <div class="admin-stat-box">Pending Approval<br /><strong>@Model.PendingCount</strong></div>
+    <div class="admin-stat-box">Approved Today<br /><strong>@Model.ApprovedToday</strong></div>
+    <div class="admin-stat-box">Rejected<br /><strong>@Model.RejectedCount</strong></div>
+    <div class="admin-stat-box">Deactivated<br /><strong>@Model.DeactivatedCount</strong></div>
+</div>
+
+<div class="admin-table-card">
+    <div class="admin-table-header">
+        <span class="admin-table-title">Pending Approval</span>
+        <span class="badge-pending">@Model.PendingCount Pending</span>
+    </div>
+    <table class="admin-table">
+        <thead><tr><th>Name</th><th>Role</th><th>Email</th><th>Registered</th><th>Action</th></tr></thead>
+        <tbody>
+            @foreach (var u in Model.PendingUsers)
+            {
+                <tr>
+                    <td>@u.Name</td>
+                    <td>@(userRoles.GetValueOrDefault(u.Id, "—"))</td>
+                    <td>@u.Email</td>
+                    <td>@u.CreatedAt.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        <div style="display:flex;gap:6px">
+                            <form asp-action="SetUserStatus" method="post" style="display:inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="userId" value="@u.Id" />
+                                <input type="hidden" name="status" value="Active" />
+                                <input type="hidden" name="returnPage" value="ApproveUsers" />
+                                <button type="submit" class="btn-admin-activate">Activate</button>
+                            </form>
+                            <form asp-action="SetUserStatus" method="post" style="display:inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="userId" value="@u.Id" />
+                                <input type="hidden" name="status" value="Deactivated" />
+                                <input type="hidden" name="returnPage" value="ApproveUsers" />
+                                <button type="submit" class="btn-admin-deactivate">Deactivate</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+            @if (!Model.PendingUsers.Any()) { <tr><td colspan="5" class="text-center text-muted">No pending users.</td></tr> }
+        </tbody>
+    </table>
+</div>
+
+<div class="admin-table-card mt-3">
+    <div class="admin-table-header">
+        <span class="admin-table-title">Deactivated Accounts</span>
+    </div>
+    <table class="admin-table">
+        <thead><tr><th>Name</th><th>Role</th><th>Email</th><th>Registered</th><th>Action</th></tr></thead>
+        <tbody>
+            @foreach (var u in Model.DeactivatedUsers)
+            {
+                <tr>
+                    <td>@u.Name</td>
+                    <td>@(userRoles.GetValueOrDefault(u.Id, "—"))</td>
+                    <td>@u.Email</td>
+                    <td>@u.CreatedAt.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        <form asp-action="SetUserStatus" method="post" style="display:inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="userId" value="@u.Id" />
+                            <input type="hidden" name="status" value="Active" />
+                            <input type="hidden" name="returnPage" value="ApproveUsers" />
+                            <button type="submit" class="btn-admin-activate">Reactivate</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            @if (!Model.DeactivatedUsers.Any()) { <tr><td colspan="5" class="text-center text-muted">No deactivated accounts.</td></tr> }
+        </tbody>
+    </table>
+</div>
+
+@await Html.PartialAsync("_AdminNavClose")

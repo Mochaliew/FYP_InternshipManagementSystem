@@ -1,0 +1,139 @@
+@model List<FYP_InternshipManagementSystem.Models.ApplicationUser>
+@{
+    ViewData["Title"] = "Security & Authentication";
+    var userRoles = ViewBag.UserRoles as Dictionary<string, string>;
+}
+
+@await Html.PartialAsync("_AdminNav")
+
+<style>
+    .security-toolbar {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    .security-note {
+        color: #6b7280;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .security-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        background: #f3f4f6;
+        color: #374151;
+    }
+
+    .security-badge.active { background: #dcfce7; color: #166534; }
+    .security-badge.pending { background: #fef3c7; color: #92400e; }
+    .security-badge.deactivated { background: #fee2e2; color: #991b1b; }
+    .security-badge.rejected { background: #e5e7eb; color: #374151; }
+
+    .role-pill {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 999px;
+        background: #eef2ff;
+        color: #3730a3;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    @@media (max-width: 900px) {
+        .security-toolbar {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+</style>
+
+<div class="admin-page-header">
+    <div>
+        <div class="admin-page-title">Security & Authentication</div>
+        <div class="admin-page-sub">Manage account status, role-based access, and authentication control</div>
+    </div>
+</div>
+
+<div class="admin-stats-row">
+    <div class="admin-stat-box">Total Users<br /><strong>@ViewBag.TotalUsers</strong></div>
+    <div class="admin-stat-box">Active<br /><strong>@ViewBag.ActiveUsers</strong></div>
+    <div class="admin-stat-box">Pending<br /><strong>@ViewBag.PendingUsers</strong></div>
+    <div class="admin-stat-box">Deactivated<br /><strong>@ViewBag.DeactivatedUsers</strong></div>
+</div>
+
+<div class="admin-table-card">
+    <div class="security-toolbar">
+        <div>
+            <div class="admin-table-title">User Security List</div>
+            <div class="security-note">Deactivate accounts to block login access. Activate accounts to allow users to log in again.</div>
+        </div>
+        <a href="/Admin/ManageAccount" class="btn-admin-report">Go to Account Management</a>
+    </div>
+
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Created At</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Any())
+            {
+                foreach (var user in Model)
+                {
+                    var role = userRoles != null && userRoles.ContainsKey(user.Id) ? userRoles[user.Id] : "No Role";
+                    var statusClass = user.Status == "Active" ? "active" : user.Status == "Pending" ? "pending" : user.Status == "Deactivated" ? "deactivated" : "rejected";
+                    <tr>
+                        <td>@user.Name</td>
+                        <td>@user.Email</td>
+                        <td><span class="role-pill">@role</span></td>
+                        <td><span class="security-badge @statusClass">@user.Status</span></td>
+                        <td>@user.CreatedAt.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            @if (user.Status == "Deactivated")
+                            {
+                                <form asp-controller="Admin" asp-action="SetUserStatus" method="post" style="display:inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="userId" value="@user.Id" />
+                                    <input type="hidden" name="status" value="Active" />
+                                    <input type="hidden" name="returnPage" value="SecurityAuthentication" />
+                                    <button type="submit" class="btn-admin-activate">Activate</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form asp-controller="Admin" asp-action="SetUserStatus" method="post" style="display:inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="userId" value="@user.Id" />
+                                    <input type="hidden" name="status" value="Deactivated" />
+                                    <input type="hidden" name="returnPage" value="SecurityAuthentication" />
+                                    <button type="submit" class="btn-admin-deactivate">Deactivate</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="6" class="text-center text-muted">No users found.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@await Html.PartialAsync("_AdminNavClose")

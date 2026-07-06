@@ -1,0 +1,32 @@
+@{
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+}
+<div class="admin-shell">
+    <!-- Top bar -->
+    <div class="admin-topbar">
+        <div class="admin-brand">Administrator Dashboard</div>
+        <form asp-controller="Admin" asp-action="Logout" method="post" style="display:inline">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn-logout">Logout</button>
+        </form>
+    </div>
+
+    <div class="admin-body">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-label">Admin Panel</div>
+            <div class="sidebar-section-label">Account Management</div>
+            <a href="/Admin/ManageAccount" class="sidebar-link @(action == "ManageAccount" || action == "EditStudent" || action == "EditCompany" || action == "AddStudent" || action == "AddCompany" ? "active" : "")">Manage Account</a>
+            <a href="/Admin/ApproveUsers" class="sidebar-link @(action == "ApproveUsers" ? "active" : "")">Approve Users</a>
+            <a href="/Admin/InternshipRecords" class="sidebar-link @(action == "InternshipRecords" ? "active" : "")">Internship Records</a>
+            <div class="sidebar-section-label mt-2">Monitoring</div>
+            <a href="/Admin/Applications" class="sidebar-link @(action == "Applications" ? "active" : "")">Applications</a>
+            <a href="/Admin/MonitoringReporting" class="sidebar-link @(action == "MonitoringReporting" ? "active" : "")">Monitoring & Reporting</a>
+            <a href="/Admin/Reports" class="sidebar-link @(action == "Reports" ? "active" : "")">Reports</a>
+
+            <div class="sidebar-section-label mt-2">Security</div>
+            <a href="/Admin/SecurityAuthentication" class="sidebar-link @(action == "SecurityAuthentication" ? "active" : "")">Security & Authentication</a>
+        </aside>
+
+        <!-- Main content -->
+        <main class="admin-main">

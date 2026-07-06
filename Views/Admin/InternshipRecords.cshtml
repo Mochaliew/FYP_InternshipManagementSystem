@@ -1,0 +1,54 @@
+@model AdminInternshipRecordsViewModel
+@{ ViewData["Title"] = "Administrator panel - internship records"; }
+
+@await Html.PartialAsync("_AdminNav")
+
+@if (TempData["Success"] != null) { <div class="alert-success mb-3">@TempData["Success"]</div> }
+
+<div class="admin-page-header">
+    <div>
+        <div class="admin-page-title">Internship Records</div>
+        <div class="admin-page-sub">maintain internship records</div>
+    </div>
+</div>
+
+<div class="admin-table-card">
+    <div class="admin-table-header">
+        <span class="admin-table-title">Internships</span>
+        <form method="get" style="display:inline">
+            <select name="statusFilter" class="admin-select" onchange="this.form.submit()">
+                <option value="">All Internships</option>
+                <option value="Active" selected="@(Model.StatusFilter == "Active")">Active</option>
+                <option value="Inactive" selected="@(Model.StatusFilter == "Inactive")">Inactive</option>
+            </select>
+        </form>
+    </div>
+    <table class="admin-table">
+        <thead><tr><th>ID</th><th>Title</th><th>Company</th><th>Department</th><th>Applicants</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>
+            @foreach (var i in Model.Internships)
+            {
+                <tr>
+                    <td>@i.InternshipId</td>
+                    <td>@i.Title</td>
+                    <td>@i.Company.User.Name</td>
+                    <td>@i.Department</td>
+                    <td>@i.Applications.Count</td>
+                    <td><span class="@(i.IsActive?"badge-active":"badge-inactive")">@(i.IsActive?"Active":"Inactive")</span></td>
+                    <td>
+                        <form asp-action="ToggleInternshipStatus" method="post" style="display:inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@i.InternshipId" />
+                            <button type="submit" class="@(i.IsActive?"btn-admin-deactivate":"btn-admin-activate")">
+                                @(i.IsActive ? "Deactivate" : "Activate")
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            @if (!Model.Internships.Any()) { <tr><td colspan="7" class="text-center text-muted">No internships found.</td></tr> }
+        </tbody>
+    </table>
+</div>
+
+@await Html.PartialAsync("_AdminNavClose")

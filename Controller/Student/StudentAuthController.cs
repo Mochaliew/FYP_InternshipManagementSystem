@@ -34,7 +34,8 @@ namespace FYP_InternshipManagementSystem.Controllers.Student
                 UserName = model.Email,
                 Email = model.Email,
                 Name = model.Email.Split('@')[0],
-                EmailConfirmed = true
+                EmailConfirmed = true,
+                Status = "Active"
             };
 
             var result = await _userManager.CreateAsync(user, model.Password);
@@ -72,13 +73,42 @@ namespace FYP_InternshipManagementSystem.Controllers.Student
                 return View(model);
             }
 
-            var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, false);
-            if (!result.Succeeded)
+            // Check password first, then show account-status popup.
+            // This is important because PasswordSignInAsync may only return "not succeeded"
+            // when the account is locked/deactivated, so the custom popup will not appear.
+            var passwordCorrect = await _userManager.CheckPasswordAsync(user, model.Password);
+            if (!passwordCorrect)
             {
                 ModelState.AddModelError(string.Empty, "Invalid email or password.");
                 return View(model);
             }
 
+            if (user.Status == "Deactivated")
+            {
+                ViewBag.PopupMessage = "Your student account has been deactivated. Please contact the administrator for assistance.";
+                return View(model);
+            }
+
+            if (user.Status == "Pending")
+            {
+                ViewBag.PopupMessage = "Your student account is still pending approval. Please wait for administrator approval.";
+                return View(model);
+            }
+
+            if (user.Status == "Rejected")
+            {
+                ViewBag.PopupMessage = "Your student account registration has been rejected. Please contact the administrator for assistance.";
+                return View(model);
+            }
+
+            // If the account was previously locked by admin, prevent login unless status is Active.
+            if (user.Status != "Active")
+            {
+                ViewBag.PopupMessage = "Your student account is not active. Please contact the administrator for assistance.";
+                return View(model);
+            }
+
+            await _signInManager.SignInAsync(user, isPersistent: model.RememberMe);
             return RedirectToAction("Listings", "Student");
         }
 
