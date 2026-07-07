@@ -21,6 +21,12 @@ namespace FYP_InternshipManagementSystem.Controllers.Student
             _db = db;
         }
 
+
+
+
+
+        // Register Student
+
         [HttpGet]
         public IActionResult Register() => View();
 
@@ -57,6 +63,12 @@ namespace FYP_InternshipManagementSystem.Controllers.Student
             await _signInManager.SignInAsync(user, isPersistent: false);
             return RedirectToAction("Listings", "Student");
         }
+
+
+
+
+
+        // Login and Logout Student
 
         [HttpGet]
         public IActionResult Login() => View();

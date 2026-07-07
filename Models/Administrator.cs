@@ -11,7 +11,6 @@ namespace FYP_InternshipManagementSystem.Models
         [Required]
         public string UserId { get; set; } = string.Empty;
 
-        // Navigation
         [ForeignKey("UserId")]
         public ApplicationUser User { get; set; } = null!;
         public ICollection<Report> Reports { get; set; } = new List<Report>();

@@ -35,7 +35,12 @@ namespace FYP_InternshipManagementSystem.Controllers.Company
             ViewBag.ProfilePic = company.ProfilePic;
         }
 
-        // ── Listings (Dashboard) ─────────────────────────────────
+
+
+
+
+        // Company Dashboard 
+
         public async Task<IActionResult> Listings()
         {
             var company = await GetCompanyAsync();
@@ -56,7 +61,12 @@ namespace FYP_InternshipManagementSystem.Controllers.Company
             return View(vm);
         }
 
-        // ── Post Internship ──────────────────────────────────────
+
+
+
+
+        //  Internship Management ( Post, Edit, Deactivate, Remove )
+
         [HttpGet]
         public async Task<IActionResult> PostInternship()
         {
@@ -87,7 +97,6 @@ namespace FYP_InternshipManagementSystem.Controllers.Company
             return RedirectToAction("Listings");
         }
 
-        // ── Edit Internship ──────────────────────────────────────
         [HttpGet]
         public async Task<IActionResult> EditListing(int id)
         {
@@ -160,7 +169,12 @@ namespace FYP_InternshipManagementSystem.Controllers.Company
             return RedirectToAction("Listings");
         }
 
-        // ── Applications ─────────────────────────────────────────
+
+
+
+
+        // Applications Management ( Applications,  Application Details, Applicant Profile, Update Application Status )
+
         public async Task<IActionResult> Applications()
         {
             var company = await GetCompanyAsync();
@@ -242,7 +256,12 @@ namespace FYP_InternshipManagementSystem.Controllers.Company
             return View(application);
         }
 
-        // ── Profile ───────────────────────────────────────────────
+
+
+
+
+        // Profile Management ( Profile, Change Password, Change Email, Logout )
+
         [HttpGet]
         public async Task<IActionResult> Profile()
         {

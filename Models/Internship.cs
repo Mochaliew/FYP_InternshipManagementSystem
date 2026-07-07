@@ -20,7 +20,6 @@ namespace FYP_InternshipManagementSystem.Models
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public bool IsActive { get; set; } = true;
 
-        // Navigation
         [ForeignKey("CompanyId")]
         public Company Company { get; set; } = null!;
         public ICollection<Application> Applications { get; set; } = new List<Application>();

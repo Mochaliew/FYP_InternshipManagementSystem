@@ -38,7 +38,12 @@ namespace FYP_InternshipManagementSystem.Controllers.Student
             ViewBag.ProfilePic = student.ProfilePic;
         }
 
-        // ── Listings ─────────────────────────────────────────────
+
+
+
+
+        //  Listings 
+
         public async Task<IActionResult> Listings(
             string? search,
             string? location,
@@ -52,6 +57,12 @@ namespace FYP_InternshipManagementSystem.Controllers.Student
             var query = _db.Internships
                 .Include(i => i.Company).ThenInclude(c => c.User)
                 .Where(i => i.IsActive);
+
+
+
+
+
+            // Filter
 
             if (!string.IsNullOrWhiteSpace(search))
             {
@@ -72,8 +83,6 @@ namespace FYP_InternshipManagementSystem.Controllers.Student
                 query = query.Where(i => i.Department.Contains(department));
             }
 
-            // Load first, then apply allowance/duration parsing safely because
-            // Allowance and Duration are stored as strings in the database.
             var internships = await query.ToListAsync();
 
             if (!string.IsNullOrWhiteSpace(allowanceRange))
@@ -138,7 +147,12 @@ namespace FYP_InternshipManagementSystem.Controllers.Student
             return int.TryParse(digits, out var number) ? number : 0;
         }
 
-        // ── Apply ────────────────────────────────────────────────
+
+
+
+
+        // Apply internship
+
         [HttpGet]
         public async Task<IActionResult> Apply(int id)
         {
@@ -228,7 +242,12 @@ namespace FYP_InternshipManagementSystem.Controllers.Student
             return RedirectToAction("MyApplication");
         }
 
-        // ── My Application ────────────────────────────────────────
+
+
+
+
+        // Student Application 
+
         public async Task<IActionResult> MyApplication()
         {
             var student = await GetStudentAsync();
@@ -257,7 +276,12 @@ namespace FYP_InternshipManagementSystem.Controllers.Student
             return View(application);
         }
 
-        // ── Saved Listings ────────────────────────────────────────
+
+
+
+
+        //  Saved Listings Management 
+
         public async Task<IActionResult> SavedListing()
         {
             var student = await GetStudentAsync();
@@ -302,7 +326,12 @@ namespace FYP_InternshipManagementSystem.Controllers.Student
             return RedirectToAction("SavedListing");
         }
 
-        // ── Profile ───────────────────────────────────────────────
+
+
+
+
+        //  Profile Management 
+
         [HttpGet]
         public async Task<IActionResult> Profile()
         {
@@ -326,7 +355,6 @@ namespace FYP_InternshipManagementSystem.Controllers.Student
         [HttpPost]
         public async Task<IActionResult> Profile(StudentProfileViewModel model)
         {
-            // Remove IFormFile fields from ModelState — they are always optional
             ModelState.Remove("ProfilePicFile");
             ModelState.Remove("ResumeFile");
 
@@ -334,7 +362,6 @@ namespace FYP_InternshipManagementSystem.Controllers.Student
 
             if (!ModelState.IsValid)
             {
-                // Re-populate display-only fields before returning view
                 model.ProfilePicPath = student.ProfilePic;
                 model.ResumeName = student.ResumeName;
                 model.ResumePath = student.ResumePath;
@@ -352,7 +379,11 @@ namespace FYP_InternshipManagementSystem.Controllers.Student
             student.CGPA = model.CGPA;
             student.EducationalInstitution = model.EducationalInstitution;
 
-            // Profile picture upload
+
+
+
+            // profile pic upload 
+
             if (model.ProfilePicFile != null && model.ProfilePicFile.Length > 0)
             {
                 try
@@ -373,7 +404,11 @@ namespace FYP_InternshipManagementSystem.Controllers.Student
                 }
             }
 
-            // Resume upload
+
+
+
+            // resume upload
+
             if (model.ResumeFile != null && model.ResumeFile.Length > 0)
             {
                 try
@@ -420,7 +455,6 @@ namespace FYP_InternshipManagementSystem.Controllers.Student
             return RedirectToAction("Profile");
         }
 
-        // GET fallback — if someone navigates directly to /Student/ChangeEmail redirect to profile
         [HttpGet]
         public IActionResult ChangeEmail()
         {
@@ -438,7 +472,6 @@ namespace FYP_InternshipManagementSystem.Controllers.Student
 
             var user = await _userManager.GetUserAsync(User);
 
-            // Verify current password before allowing email change
             var passwordValid = await _userManager.CheckPasswordAsync(user!, model.CurrentPassword);
             if (!passwordValid)
             {
@@ -446,7 +479,6 @@ namespace FYP_InternshipManagementSystem.Controllers.Student
                 return RedirectToAction("Profile");
             }
 
-            // Check the new email isn't already taken by another account
             var existing = await _userManager.FindByEmailAsync(model.NewEmail);
             if (existing != null && existing.Id != user!.Id)
             {
@@ -462,7 +494,6 @@ namespace FYP_InternshipManagementSystem.Controllers.Student
                 return RedirectToAction("Profile");
             }
 
-            // Username is also kept in sync with email throughout this project
             var usernameResult = await _userManager.SetUserNameAsync(user!, model.NewEmail);
             if (!usernameResult.Succeeded)
             {
@@ -470,7 +501,6 @@ namespace FYP_InternshipManagementSystem.Controllers.Student
                 return RedirectToAction("Profile");
             }
 
-            // Re-sign-in so the auth cookie reflects the new email/username immediately
             var signInManager = HttpContext.RequestServices.GetRequiredService<SignInManager<ApplicationUser>>();
             await signInManager.RefreshSignInAsync(user!);
 

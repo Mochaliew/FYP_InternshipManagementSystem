@@ -12,7 +12,7 @@ namespace FYP_InternshipManagementSystem.Models
         public string UserId { get; set; } = string.Empty;
 
         public string ContactNumber { get; set; } = string.Empty;
-        public string EducationalInstitution { get; set; } = "Tunku Abdul Rahman University of Management and Technology";
+        public string EducationalInstitution { get; set; } = string.Empty;
         public string Programme { get; set; } = string.Empty;
 
         [Column(TypeName = "decimal(3,2)")]
@@ -22,7 +22,6 @@ namespace FYP_InternshipManagementSystem.Models
         public string? ResumePath { get; set; }
         public string? ResumeName { get; set; }
 
-        // Navigation
         [ForeignKey("UserId")]
         public ApplicationUser User { get; set; } = null!;
         public ICollection<Application> Applications { get; set; } = new List<Application>();

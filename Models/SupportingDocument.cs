@@ -14,7 +14,6 @@ namespace FYP_InternshipManagementSystem.Models
         public string SupportingDocName { get; set; } = string.Empty;
         public string SupportingDocPath { get; set; } = string.Empty;
 
-        // Navigation
         [ForeignKey("ApplicationId")]
         public Application Application { get; set; } = null!;
     }

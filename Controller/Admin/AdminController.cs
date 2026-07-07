@@ -26,10 +26,21 @@ namespace FYP_InternshipManagementSystem.Controllers.Admin
             _signInManager = signInManager;
         }
 
+
+
+
+        // Dashboard Action
+
         public IActionResult Dashboard()
         {
             return RedirectToAction("ManageAccount");
         }
+
+
+
+
+
+        // Login and Logout Actions
 
         [AllowAnonymous, HttpGet]
         public IActionResult Login() => View();
@@ -70,6 +81,12 @@ namespace FYP_InternshipManagementSystem.Controllers.Admin
             return RedirectToAction("Login");
         }
 
+
+
+
+
+        // Account Management Actions
+
         public async Task<IActionResult> ManageAccount(string? statusFilter)
         {
             var studentsQ = _db.Students.Include(s => s.User).AsQueryable();
@@ -96,6 +113,12 @@ namespace FYP_InternshipManagementSystem.Controllers.Admin
 
             return View(vm);
         }
+
+
+
+
+
+        // Edit Student and Company Actions
 
         [HttpGet]
         public async Task<IActionResult> EditStudent(int id)
@@ -190,6 +213,13 @@ namespace FYP_InternshipManagementSystem.Controllers.Admin
             return RedirectToAction("ManageAccount");
         }
 
+
+
+
+
+
+        // User Status Management Actions
+
         [HttpPost]
         public async Task<IActionResult> SetUserStatus(
             string userId,
@@ -216,6 +246,13 @@ namespace FYP_InternshipManagementSystem.Controllers.Admin
 
             return RedirectToAction(returnPage);
         }
+
+
+
+
+
+
+        // Add Student and Company Actions
 
         [HttpGet]
         public IActionResult AddStudent() => View(new RegisterViewModel());
@@ -296,6 +333,13 @@ namespace FYP_InternshipManagementSystem.Controllers.Admin
             return RedirectToAction("ManageAccount");
         }
 
+
+
+
+
+
+        // Admin Approval Actions
+
         public async Task<IActionResult> ApproveUsers()
         {
             var allUsers = await _db.Users.ToListAsync();
@@ -323,6 +367,12 @@ namespace FYP_InternshipManagementSystem.Controllers.Admin
 
             return View(vm);
         }
+
+
+
+
+
+        // Internship and Application Management Actions
 
         public async Task<IActionResult> InternshipRecords(string? statusFilter)
         {
@@ -387,6 +437,13 @@ namespace FYP_InternshipManagementSystem.Controllers.Admin
             return View(vm);
         }
 
+
+
+
+
+
+        // Admin Application Status Update and Deletion Actions
+
         [HttpPost]
         public async Task<IActionResult> AdminUpdateApplicationStatus(int applicationId, string status)
         {
@@ -425,6 +482,13 @@ namespace FYP_InternshipManagementSystem.Controllers.Admin
             return RedirectToAction("Applications");
         }
 
+
+
+
+
+
+        // Admin Monitoring and Reporting Actions
+
         public async Task<IActionResult> MonitoringReporting()
         {
             ViewBag.TotalApplications = await _db.Applications.CountAsync();
@@ -444,6 +508,13 @@ namespace FYP_InternshipManagementSystem.Controllers.Admin
 
             return View(recentApplications);
         }
+
+
+
+
+
+
+        // Admin Report Generation Actions
 
         public async Task<IActionResult> Reports()
         {
@@ -493,153 +564,153 @@ namespace FYP_InternshipManagementSystem.Controllers.Admin
             }
 
             var html = $@"
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset='utf-8'>
-    <title>Admin Internship Report</title>
-    <style>
-        body {{
-            margin: 0;
-            padding: 35px;
-            font-family: Arial, sans-serif;
-            background: #f7eef1;
-            color: #1d2733;
-        }}
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset='utf-8'>
+                <title>Admin Internship Report</title>
+                <style>
+                    body {{
+                        margin: 0;
+                        padding: 35px;
+                        font-family: Arial, sans-serif;
+                        background: #f7eef1;
+                        color: #1d2733;
+                    }}
 
-        .report-wrapper {{
-            background: #ffffff;
-            border-radius: 14px;
-            padding: 28px;
-            border: 1px solid #ead8de;
-        }}
+                    .report-wrapper {{
+                        background: #ffffff;
+                        border-radius: 14px;
+                        padding: 28px;
+                        border: 1px solid #ead8de;
+                    }}
 
-        .report-header {{
-            border-bottom: 1px solid #ead8de;
-            padding-bottom: 18px;
-            margin-bottom: 24px;
-        }}
+                    .report-header {{
+                        border-bottom: 1px solid #ead8de;
+                        padding-bottom: 18px;
+                        margin-bottom: 24px;
+                    }}
 
-        .report-title {{
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 6px;
-        }}
+                    .report-title {{
+                        font-size: 28px;
+                        font-weight: 700;
+                        margin-bottom: 6px;
+                    }}
 
-        .report-subtitle {{
-            color: #777;
-            font-size: 14px;
-        }}
+                    .report-subtitle {{
+                        color: #777;
+                        font-size: 14px;
+                    }}
 
-        .stats {{
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-bottom: 28px;
-        }}
+                    .stats {{
+                        display: grid;
+                        grid-template-columns: repeat(4, 1fr);
+                        gap: 16px;
+                        margin-bottom: 28px;
+                    }}
 
-        .stat-card {{
-            background: #fff;
-            border: 1px solid #ead8de;
-            border-radius: 12px;
-            padding: 18px;
-        }}
+                    .stat-card {{
+                        background: #fff;
+                        border: 1px solid #ead8de;
+                        border-radius: 12px;
+                        padding: 18px;
+                    }}
 
-        .stat-card span {{
-            display: block;
-            color: #777;
-            font-size: 13px;
-            margin-bottom: 10px;
-        }}
+                    .stat-card span {{
+                        display: block;
+                        color: #777;
+                        font-size: 13px;
+                        margin-bottom: 10px;
+                    }}
 
-        .stat-card strong {{
-            font-size: 26px;
-            color: #000;
-        }}
+                    .stat-card strong {{
+                        font-size: 26px;
+                        color: #000;
+                    }}
 
-        table {{
-            width: 100%;
-            border-collapse: collapse;
-            background: #fff;
-            border-radius: 12px;
-            overflow: hidden;
-        }}
+                    table {{
+                        width: 100%;
+                        border-collapse: collapse;
+                        background: #fff;
+                        border-radius: 12px;
+                        overflow: hidden;
+                    }}
 
-        th {{
-            background: #f9f2f4;
-            color: #333;
-            text-align: left;
-            padding: 13px;
-            font-size: 13px;
-            border-bottom: 1px solid #ead8de;
-        }}
+                    th {{
+                        background: #f9f2f4;
+                        color: #333;
+                        text-align: left;
+                        padding: 13px;
+                        font-size: 13px;
+                        border-bottom: 1px solid #ead8de;
+                    }}
 
-        td {{
-            padding: 13px;
-            border-bottom: 1px solid #f1e4e8;
-            font-size: 14px;
-        }}
+                    td {{
+                        padding: 13px;
+                        border-bottom: 1px solid #f1e4e8;
+                        font-size: 14px;
+                    }}
 
-        .footer {{
-            margin-top: 25px;
-            display: flex;
-            justify-content: space-between;
-            color: #666;
-            font-size: 13px;
-        }}
-    </style>
-</head>
-<body>
-    <div class='report-wrapper'>
-        <div class='report-header'>
-            <div class='report-title'>Internship Management Report</div>
-            <div class='report-subtitle'>Administrator summary report generated on {generatedAt}</div>
-        </div>
+                    .footer {{
+                        margin-top: 25px;
+                        display: flex;
+                        justify-content: space-between;
+                        color: #666;
+                        font-size: 13px;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class='report-wrapper'>
+                    <div class='report-header'>
+                        <div class='report-title'>Internship Management Report</div>
+                        <div class='report-subtitle'>Administrator summary report generated on {generatedAt}</div>
+                    </div>
 
-        <div class='stats'>
-            <div class='stat-card'>
-                <span>Placement Rate</span>
-                <strong>{vm.PlacementRate}%</strong>
-            </div>
-            <div class='stat-card'>
-                <span>Total Students</span>
-                <strong>{vm.TotalStudents}</strong>
-            </div>
-            <div class='stat-card'>
-                <span>Active Internships</span>
-                <strong>{vm.ActiveInternships}</strong>
-            </div>
-            <div class='stat-card'>
-                <span>Approved Applications</span>
-                <strong>{vm.CompletedApplications}</strong>
-            </div>
-        </div>
+                    <div class='stats'>
+                        <div class='stat-card'>
+                            <span>Placement Rate</span>
+                            <strong>{vm.PlacementRate}%</strong>
+                        </div>
+                        <div class='stat-card'>
+                            <span>Total Students</span>
+                            <strong>{vm.TotalStudents}</strong>
+                        </div>
+                        <div class='stat-card'>
+                            <span>Active Internships</span>
+                            <strong>{vm.ActiveInternships}</strong>
+                        </div>
+                        <div class='stat-card'>
+                            <span>Approved Applications</span>
+                            <strong>{vm.CompletedApplications}</strong>
+                        </div>
+                    </div>
 
-        <h2>Placement Summary by Programme</h2>
+                    <h2>Placement Summary by Programme</h2>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Programme</th>
-                    <th>Total Students</th>
-                    <th>Placed</th>
-                    <th>Pending</th>
-                    <th>Rejected</th>
-                    <th>Rate</th>
-                </tr>
-            </thead>
-            <tbody>
-                {rows}
-            </tbody>
-        </table>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Programme</th>
+                                <th>Total Students</th>
+                                <th>Placed</th>
+                                <th>Pending</th>
+                                <th>Rejected</th>
+                                <th>Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {rows}
+                        </tbody>
+                    </table>
 
-        <div class='footer'>
-            <div>FYP Internship Management System</div>
-            <div>Prepared for Administrator</div>
-        </div>
-    </div>
-</body>
-</html>";
+                    <div class='footer'>
+                        <div>FYP Internship Management System</div>
+                        <div>Prepared for Administrator</div>
+                    </div>
+                </div>
+            </body>
+            </html>";
 
             var bytes = Encoding.UTF8.GetBytes(html);
             var fileName = $"Internship_Report_{DateTime.Now:yyyyMMdd_HHmm}.html";
@@ -673,29 +744,6 @@ namespace FYP_InternshipManagementSystem.Controllers.Admin
             var fileName = $"Internship_Report_{DateTime.Now:yyyyMMdd_HHmm}.csv";
 
             return File(bytes, "text/csv", fileName);
-        }
-
-        public async Task<IActionResult> SecurityAuthentication()
-        {
-            var users = await _db.Users
-                .OrderByDescending(u => u.CreatedAt)
-                .ToListAsync();
-
-            var userRoles = new Dictionary<string, string>();
-
-            foreach (var user in users)
-            {
-                var roles = await _userManager.GetRolesAsync(user);
-                userRoles[user.Id] = roles.FirstOrDefault() ?? "No Role";
-            }
-
-            ViewBag.TotalUsers = users.Count;
-            ViewBag.ActiveUsers = users.Count(u => u.Status == "Active");
-            ViewBag.PendingUsers = users.Count(u => u.Status == "Pending");
-            ViewBag.DeactivatedUsers = users.Count(u => u.Status == "Deactivated");
-            ViewBag.UserRoles = userRoles;
-
-            return View(users);
         }
 
         private async Task<AdminReportsViewModel> BuildReportViewModel()
@@ -732,5 +780,36 @@ namespace FYP_InternshipManagementSystem.Controllers.Admin
                 PlacementByProgramme = grouped
             };
         }
+
+
+
+
+
+        // Admin Security and Authentication Actions
+
+        public async Task<IActionResult> SecurityAuthentication()
+        {
+            var users = await _db.Users
+                .OrderByDescending(u => u.CreatedAt)
+                .ToListAsync();
+
+            var userRoles = new Dictionary<string, string>();
+
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                userRoles[user.Id] = roles.FirstOrDefault() ?? "No Role";
+            }
+
+            ViewBag.TotalUsers = users.Count;
+            ViewBag.ActiveUsers = users.Count(u => u.Status == "Active");
+            ViewBag.PendingUsers = users.Count(u => u.Status == "Pending");
+            ViewBag.DeactivatedUsers = users.Count(u => u.Status == "Deactivated");
+            ViewBag.UserRoles = userRoles;
+
+            return View(users);
+        }
+
+        
     }
 }

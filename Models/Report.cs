@@ -15,7 +15,6 @@ namespace FYP_InternshipManagementSystem.Models
         public string ReportName { get; set; } = string.Empty;
         public string ReportPath { get; set; } = string.Empty;
 
-        // Navigation
         [ForeignKey("AdminId")]
         public Administrator Administrator { get; set; } = null!;
     }

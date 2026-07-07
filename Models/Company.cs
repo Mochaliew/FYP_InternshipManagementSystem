@@ -17,7 +17,6 @@ namespace FYP_InternshipManagementSystem.Models
         public string IndustryType { get; set; } = string.Empty;
         public string? ProfilePic { get; set; }
 
-        // Navigation
         [ForeignKey("UserId")]
         public ApplicationUser User { get; set; } = null!;
         public ICollection<Internship> Internships { get; set; } = new List<Internship>();

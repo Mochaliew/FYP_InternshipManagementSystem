@@ -21,6 +21,13 @@ namespace FYP_InternshipManagementSystem.Controllers.Company
         [HttpGet]
         public IActionResult Register() => View();
 
+
+
+
+
+
+        // Register new company 
+
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
@@ -48,6 +55,13 @@ namespace FYP_InternshipManagementSystem.Controllers.Company
             await _signInManager.SignInAsync(user, isPersistent: false);
             return RedirectToAction("Listings", "Company");
         }
+
+
+
+
+
+
+        // Login and Logout company
 
         [HttpGet]
         public IActionResult Login() => View();

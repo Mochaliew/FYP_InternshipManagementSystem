@@ -16,7 +16,6 @@ namespace FYP_InternshipManagementSystem.Models
 
         public DateTime SavedAt { get; set; } = DateTime.Now;
 
-        // Navigation
         [ForeignKey("StudentId")]
         public Student Student { get; set; } = null!;
 

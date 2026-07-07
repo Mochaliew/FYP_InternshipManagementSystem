@@ -3,7 +3,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace FYP_InternshipManagementSystem.Models.ViewModels
 {
-    // ─── Auth ───────────────────────────────────────────────
+
+
+
+
+
+    //  Authentication and Account Management ViewModels
+
     public class RegisterViewModel
     {
         [Required, EmailAddress]
@@ -48,7 +54,12 @@ namespace FYP_InternshipManagementSystem.Models.ViewModels
         public string CurrentPassword { get; set; } = string.Empty;
     }
 
-    // ─── Student ────────────────────────────────────────────
+
+
+
+
+    //  Student 
+
     public class StudentProfileViewModel
     {
         public string Name { get; set; } = string.Empty;
@@ -61,13 +72,9 @@ namespace FYP_InternshipManagementSystem.Models.ViewModels
         public string EducationalInstitution { get; set; } = string.Empty;
         public string Programme { get; set; } = string.Empty;
         public decimal CGPA { get; set; }
-
-        // Existing stored paths — passed back as hidden fields so they survive round-trip
         public string? ProfilePicPath { get; set; }
         public string? ResumeName { get; set; }
         public string? ResumePath { get; set; }
-
-        // New uploads — always optional
         public IFormFile? ProfilePicFile { get; set; }
         public IFormFile? ResumeFile { get; set; }
     }
@@ -76,7 +83,6 @@ namespace FYP_InternshipManagementSystem.Models.ViewModels
     {
         public int InternshipId { get; set; }
 
-        // These are populated by the controller for display only — never bound from form data
         [Microsoft.AspNetCore.Mvc.ModelBinding.BindNever]
         public Internship Internship { get; set; } = null!;
 
@@ -98,7 +104,12 @@ namespace FYP_InternshipManagementSystem.Models.ViewModels
         public string? Department { get; set; }
     }
 
-    // ─── Company ────────────────────────────────────────────
+
+
+
+
+    //  Company 
+
     public class CompanyProfileViewModel
     {
         public string Name { get; set; } = string.Empty;
@@ -150,7 +161,12 @@ namespace FYP_InternshipManagementSystem.Models.ViewModels
     }
 }
 
-// ─── Admin ──────────────────────────────────────────
+
+
+
+
+//  Admin 
+
 public class AdminManageAccountViewModel
 {
     public List<Student> Students { get; set; } = new();

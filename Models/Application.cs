@@ -20,11 +20,9 @@ namespace FYP_InternshipManagementSystem.Models
         // "Pending", "Approved", "Rejected"
         public string Status { get; set; } = "Pending";
 
-        // Resume snapshot at time of application
         public string? ResumePathSnapshot { get; set; }
         public string? ResumeNameSnapshot { get; set; }
 
-        // Navigation
         [ForeignKey("StudentId")]
         public Student Student { get; set; } = null!;
 

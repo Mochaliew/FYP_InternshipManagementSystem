@@ -14,7 +14,6 @@ namespace FYP_InternshipManagementSystem.Models
         public string DocumentName { get; set; } = string.Empty;
         public string DocumentPath { get; set; } = string.Empty;
 
-        // Navigation
         [ForeignKey("StudentId")]
         public Student Student { get; set; } = null!;
     }
