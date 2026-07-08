@@ -87,6 +87,48 @@ namespace FYP_InternshipManagementSystem.Controllers.Company
             return RedirectToAction("Listings", "Company");
         }
 
+
+
+
+
+        // Forget Password 
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Please complete all fields correctly.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+
+            if (user == null || !await _userManager.IsInRoleAsync(user, "Company"))
+            {
+                TempData["Error"] = "Company account not found.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            var result = await _userManager.ResetPasswordAsync(
+                user,
+                token,
+                model.NewPassword);
+
+            if (!result.Succeeded)
+            {
+                TempData["Error"] = string.Join(", ", result.Errors.Select(e => e.Description));
+                return RedirectToAction(nameof(Login));
+            }
+
+            TempData["Success"] = "Password reset successfully. Please login using your new password.";
+
+            return RedirectToAction(nameof(Login));
+        }
+
         [HttpPost]
         public async Task<IActionResult> Logout()
         {

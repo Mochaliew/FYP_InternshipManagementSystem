@@ -56,7 +56,7 @@ namespace FYP_InternshipManagementSystem.Controllers.Student
             _db.Students.Add(new FYP_InternshipManagementSystem.Models.Student
             {
                 UserId = user.Id,
-                EducationalInstitution = "Tunku Abdul Rahman University of Management and Technology"
+                
             });
             await _db.SaveChangesAsync();
 
@@ -85,9 +85,6 @@ namespace FYP_InternshipManagementSystem.Controllers.Student
                 return View(model);
             }
 
-            // Check password first, then show account-status popup.
-            // This is important because PasswordSignInAsync may only return "not succeeded"
-            // when the account is locked/deactivated, so the custom popup will not appear.
             var passwordCorrect = await _userManager.CheckPasswordAsync(user, model.Password);
             if (!passwordCorrect)
             {
@@ -113,7 +110,6 @@ namespace FYP_InternshipManagementSystem.Controllers.Student
                 return View(model);
             }
 
-            // If the account was previously locked by admin, prevent login unless status is Active.
             if (user.Status != "Active")
             {
                 ViewBag.PopupMessage = "Your student account is not active. Please contact the administrator for assistance.";
@@ -123,6 +119,58 @@ namespace FYP_InternshipManagementSystem.Controllers.Student
             await _signInManager.SignInAsync(user, isPersistent: model.RememberMe);
             return RedirectToAction("Listings", "Student");
         }
+
+
+
+
+
+        // Forget Password 
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Please complete all fields correctly.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+
+            if (user == null)
+            {
+                TempData["Error"] = "Student account not found.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            if (!await _userManager.IsInRoleAsync(user, "Student"))
+            {
+                TempData["Error"] = "Student account not found.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            var result = await _userManager.ResetPasswordAsync(
+                user,
+                token,
+                model.NewPassword);
+
+            if (!result.Succeeded)
+            {
+                TempData["Error"] =
+                    string.Join("<br>", result.Errors.Select(x => x.Description));
+
+                return RedirectToAction(nameof(Login));
+            }
+
+            TempData["Success"] =
+                "Password reset successfully. Please login using your new password.";
+
+            return RedirectToAction(nameof(Login));
+        }
+
 
         [HttpPost]
         public async Task<IActionResult> Logout()

@@ -357,6 +357,10 @@ namespace FYP_InternshipManagementSystem.Controllers.Student
         {
             ModelState.Remove("ProfilePicFile");
             ModelState.Remove("ResumeFile");
+            ModelState.Remove("ProfilePicPath");
+            ModelState.Remove("ResumePath");
+            ModelState.Remove("ResumeName");
+            ModelState.Remove("Email");
 
             var student = await GetStudentAsync();
 
@@ -374,10 +378,17 @@ namespace FYP_InternshipManagementSystem.Controllers.Student
             user.Name = model.Name;
             await _userManager.UpdateAsync(user);
 
-            student.ContactNumber = model.ContactNumber;
-            student.Programme = model.Programme;
-            student.CGPA = model.CGPA;
-            student.EducationalInstitution = model.EducationalInstitution;
+            if (!string.IsNullOrWhiteSpace(model.ContactNumber))
+                student.ContactNumber = model.ContactNumber;
+
+            if (!string.IsNullOrWhiteSpace(model.Programme))
+                student.Programme = model.Programme;
+
+            if (model.CGPA != null)
+                student.CGPA = model.CGPA;
+
+            if (!string.IsNullOrWhiteSpace(model.EducationalInstitution))
+                student.EducationalInstitution = model.EducationalInstitution;
 
 
 

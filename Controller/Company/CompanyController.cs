@@ -394,6 +394,40 @@ namespace FYP_InternshipManagementSystem.Controllers.Company
         }
 
         [HttpPost]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Please complete all fields correctly.";
+                return RedirectToAction("Login", "CompanyAuth");
+            }
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+
+            if (user == null)
+            {
+                TempData["Error"] = "Email not found.";
+                return RedirectToAction("Login", "CompanyAuth");
+            }
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            var result = await _userManager.ResetPasswordAsync(
+                user,
+                token,
+                model.NewPassword);
+
+            if (!result.Succeeded)
+            {
+                TempData["Error"] = string.Join(", ", result.Errors.Select(e => e.Description));
+                return RedirectToAction("Login", "CompanyAuth");
+            }
+
+            TempData["Success"] = "Password reset successfully.";
+            return RedirectToAction("Login", "CompanyAuth");
+        }
+
+        [HttpPost]
         public async Task<IActionResult> Logout()
         {
             var signInManager = HttpContext.RequestServices.GetRequiredService<Microsoft.AspNetCore.Identity.SignInManager<ApplicationUser>>();

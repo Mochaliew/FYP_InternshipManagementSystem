@@ -50,7 +50,13 @@
             </div>
             <div class="form-group">
                 <label>Phone Number</label>
-                <input name="ContactNumber" value="@Model.ContactNumber" class="form-input" placeholder="01XXXXXXXX" />
+                <input name="ContactNumber"
+                       value="@Model.ContactNumber"
+                       class="form-input"
+                       maxlength="10"
+                       inputmode="numeric"
+                       placeholder="0123456789"
+                       oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)" />
             </div>
             <div class="form-group">
                 <label>Educational Institution</label>
